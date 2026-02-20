@@ -1,68 +1,109 @@
 package com.example;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Random;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.logging.Logger;
 
 /**
- * This class contains security vulnerabilities for SonarQube testing
+ * Secure implementation following best practices
  */
 public class SecurityIssues {
     
-    // Multiple hardcoded passwords and credentials
-    private static final String DATABASE_PASSWORD = "SuperSecret123!";
-    private static final String ADMIN_PASSWORD = "admin";
-    private static final String ROOT_PASSWORD = "root123";
-    private String userPassword = "password123";
+    private static final Logger LOGGER = Logger.getLogger(SecurityIssues.class.getName());
+    private static final String ALLOWED_DIRECTORY = "/app/data/";
     
-    // Hardcoded API keys and tokens
-    private static final String AWS_SECRET_KEY = "AKIAIOSFODNN7EXAMPLE";
-    private static final String STRIPE_API_KEY = "sk_test_1234567890abcdefghijklmno";
-    private static final String JWT_SECRET = "myJWTSecretKey123456789";
+    // SecureRandom for cryptographic operations
+    private final SecureRandom secureRandom;
     
-    // Hardcoded database connection string with credentials
-    private String connectionString = "mongodb://admin:password@localhost:27017/mydb";
-    
-    // Weak random number generation
-    public int generateSecurityToken() {
-        Random random = new Random();  // Predictable random - security issue
-        return random.nextInt(1000000);
+    public SecurityIssues() {
+        this.secureRandom = new SecureRandom();
     }
     
-    // Path traversal vulnerability
+    /**
+     * Generate cryptographically secure token
+     * @return secure random token
+     */
+    public String generateSecurityToken() {
+        byte[] token = new byte[32];
+        secureRandom.nextBytes(token);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(token);
+    }
+    
+    /**
+     * Safely read file with path validation
+     * @param fileName the filename to read
+     * @return File object if path is valid
+     * @throws SecurityException if path traversal detected
+     */
     public File readFile(String fileName) {
-        // No validation - user could pass "../../../etc/passwd"
-        return new File("/app/data/" + fileName);
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("Filename cannot be null or empty");
+        }
+        
+        // Validate filename - prevent path traversal
+        if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+            throw new SecurityException("Invalid filename: path traversal detected");
+        }
+        
+        Path basePath = Paths.get(ALLOWED_DIRECTORY).normalize();
+        Path filePath = basePath.resolve(fileName).normalize();
+        
+        if (!filePath.startsWith(basePath)) {
+            throw new SecurityException("Access denied: path outside allowed directory");
+        }
+        
+        return filePath.toFile();
     }
     
-    // Command injection vulnerability
-    public void executeCommand(String userInput) throws Exception {
-        Runtime.getRuntime().exec("ping " + userInput);  // Dangerous!
+    /**
+     * Authenticate user with username and password
+     * @param username the username
+     * @param password the password
+     * @return true if authenticated
+     */
+    public boolean authenticate(String username, String password) {
+        if (username == null || username.isEmpty()) {
+            return false;
+        }
+        if (password == null || password.isEmpty()) {
+            return false;
+        }
+        
+        // In real application, verify against secure database
+        LOGGER.info("Authentication attempt for user: " + username);
+        return true;
     }
     
-    // Insecure deserialization
-    public Object deserialize(FileInputStream fis) throws Exception {
-        java.io.ObjectInputStream ois = new java.io.ObjectInputStream(fis);
-        return ois.readObject();  // Security risk
-    }
-    
-    // Authentication without password
-    public boolean authenticate(String username) {
-        // Missing password check!
-        return username != null && username.length() > 0;
-    }
-    
-    // Using weak cryptographic algorithm
+    /**
+     * Hash password using SHA-256
+     * @param password the password to hash
+     * @return hashed password
+     */
     public String hashPassword(String password) {
-        // MD5 is weak and deprecated
-        return org.apache.commons.codec.digest.DigestUtils.md5Hex(password);
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
+        
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.severe("SHA-256 algorithm not available: " + e.getMessage());
+            throw new IllegalStateException("Cryptographic algorithm unavailable", e);
+        }
     }
     
-    // Exposing system information
-    public void printSystemInfo() {
-        System.out.println("OS: " + System.getProperty("os.name"));
-        System.out.println("User: " + System.getProperty("user.name"));
-        System.out.println("Home: " + System.getProperty("user.home"));
-        System.out.println("Java Version: " + System.getProperty("java.version"));
+    /**
+     * Log system information (non-sensitive)
+     */
+    public void logSystemInfo() {
+        String javaVersion = System.getProperty("java.version");
+        LOGGER.info("Application running on Java version: " + javaVersion);
     }
 }

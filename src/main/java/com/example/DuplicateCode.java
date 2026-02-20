@@ -1,86 +1,93 @@
 package com.example;
 
+import java.util.logging.Logger;
+
 /**
- * This class contains duplicate code blocks for SonarQube testing
+ * Refactored class with no duplicate code
  */
 public class DuplicateCode {
     
-    // Duplicate method 1
+    private static final Logger LOGGER = Logger.getLogger(DuplicateCode.class.getName());
+    private static final String DEFAULT_COUNTRY = "USA";
+    
+    /**
+     * Common method to process any type of data
+     * @param name the name
+     * @param email the email
+     * @param type the data type (user/customer/employee)
+     */
+    private void processData(String name, String email, String type) {
+        if (name == null || name.isEmpty()) {
+            LOGGER.warning("Invalid name for " + type);
+            return;
+        }
+        if (email == null || email.isEmpty()) {
+            LOGGER.warning("Invalid email for " + type);
+            return;
+        }
+        
+        LOGGER.info("Processing " + type + ": " + name);
+        LOGGER.info("Email: " + email);
+        LOGGER.info(type + " data validated successfully");
+        LOGGER.info("Saving to database...");
+        LOGGER.info("Operation completed");
+    }
+    
+    /**
+     * Process user data
+     */
     public void processUserData(String name, String email) {
-        if (name == null || name.isEmpty()) {
-            System.out.println("Invalid name");
-            return;
-        }
-        if (email == null || email.isEmpty()) {
-            System.out.println("Invalid email");
-            return;
-        }
-        System.out.println("Processing user: " + name);
-        System.out.println("Email: " + email);
-        System.out.println("User data validated successfully");
-        System.out.println("Saving to database...");
-        System.out.println("Operation completed");
+        processData(name, email, "user");
     }
     
-    // Duplicate method 2 - almost identical to above
+    /**
+     * Process customer data
+     */
     public void processCustomerData(String name, String email) {
-        if (name == null || name.isEmpty()) {
-            System.out.println("Invalid name");
-            return;
-        }
-        if (email == null || email.isEmpty()) {
-            System.out.println("Invalid email");
-            return;
-        }
-        System.out.println("Processing user: " + name);
-        System.out.println("Email: " + email);
-        System.out.println("User data validated successfully");
-        System.out.println("Saving to database...");
-        System.out.println("Operation completed");
+        processData(name, email, "customer");
     }
     
-    // Duplicate method 3 - almost identical to above
+    /**
+     * Process employee data
+     */
     public void processEmployeeData(String name, String email) {
-        if (name == null || name.isEmpty()) {
-            System.out.println("Invalid name");
-            return;
-        }
-        if (email == null || email.isEmpty()) {
-            System.out.println("Invalid email");
-            return;
-        }
-        System.out.println("Processing user: " + name);
-        System.out.println("Email: " + email);
-        System.out.println("User data validated successfully");
-        System.out.println("Saving to database...");
-        System.out.println("Operation completed");
+        processData(name, email, "employee");
     }
     
-    // More duplicate blocks
+    /**
+     * Common method to format any address
+     * @param street the street address
+     * @param city the city
+     * @param zip the ZIP code
+     * @return formatted address string
+     */
+    private String formatAddressCommon(String street, String city, String zip) {
+        StringBuilder result = new StringBuilder();
+        result.append("Street: ").append(street).append("\n");
+        result.append("City: ").append(city).append("\n");
+        result.append("ZIP: ").append(zip).append("\n");
+        result.append("Country: ").append(DEFAULT_COUNTRY).append("\n");
+        return result.toString();
+    }
+    
+    /**
+     * Format standard address
+     */
     public String formatAddress(String street, String city, String zip) {
-        String result = "";
-        result = result + "Street: " + street + "\n";
-        result = result + "City: " + city + "\n";
-        result = result + "ZIP: " + zip + "\n";
-        result = result + "Country: USA\n";
-        return result;
+        return formatAddressCommon(street, city, zip);
     }
     
+    /**
+     * Format shipping address
+     */
     public String formatShippingAddress(String street, String city, String zip) {
-        String result = "";
-        result = result + "Street: " + street + "\n";
-        result = result + "City: " + city + "\n";
-        result = result + "ZIP: " + zip + "\n";
-        result = result + "Country: USA\n";
-        return result;
+        return formatAddressCommon(street, city, zip);
     }
     
+    /**
+     * Format billing address
+     */
     public String formatBillingAddress(String street, String city, String zip) {
-        String result = "";
-        result = result + "Street: " + street + "\n";
-        result = result + "City: " + city + "\n";
-        result = result + "ZIP: " + zip + "\n";
-        result = result + "Country: USA\n";
-        return result;
+        return formatAddressCommon(street, city, zip);
     }
 }

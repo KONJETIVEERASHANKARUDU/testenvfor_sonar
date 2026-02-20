@@ -1,128 +1,188 @@
 package com.example;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
- * Additional code smells for comprehensive SonarQube testing
+ * Clean code implementation without code smells
  */
 public class MoreCodeSmells {
     
-    // Code Smell: Public mutable static field
-    public static List<String> publicList = new ArrayList<>();
+    private static final Logger LOGGER = Logger.getLogger(MoreCodeSmells.class.getName());
+    private static final int SENIOR_AGE = 65;
+    private static final int MINOR_AGE = 18;
+    private static final int SENIOR_DISCOUNT = 10;
+    private static final int MINOR_DISCOUNT = 5;
+    private static final int MEMBER_DISCOUNT = 5;
+    private static final int LOYALTY_DISCOUNT = 5;
+    private static final int HOLIDAY_DISCOUNT = 15;
+    private static final int HIGH_PURCHASE_DISCOUNT = 10;
+    private static final int VERY_HIGH_PURCHASE_DISCOUNT = 20;
+    private static final int HIGH_PURCHASE_THRESHOLD = 100;
+    private static final int VERY_HIGH_PURCHASE_THRESHOLD = 500;
     
-    // Code Smell: Dead code
-    private void neverCalledMethod() {
-        System.out.println("This method is never called");
-    }
+    // Immutable list instead of mutable public static field
+    private static final List<String> ITEMS_LIST = Collections.emptyList();
     
-    // Code Smell: Boolean method name doesn't start with is/has/can
-    public boolean active() {
+    /**
+     * Check if active (proper boolean naming)
+     * @return true if active
+     */
+    public boolean isActive() {
         return true;
     }
     
-    // Code Smell: Multiple return statements
+    /**
+     * Get status message for HTTP code
+     * @param code the HTTP status code
+     * @return status message
+     */
     public String getStatus(int code) {
-        if (code == 200) {
-            return "OK";
-        }
-        if (code == 404) {
-            return "Not Found";
-        }
-        if (code == 500) {
-            return "Error";
-        }
-        if (code == 403) {
-            return "Forbidden";
-        }
-        if (code == 401) {
-            return "Unauthorized";
-        }
-        return "Unknown";
+        return switch (code) {
+            case 200 -> "OK";
+            case 401 -> "Unauthorized";
+            case 403 -> "Forbidden";
+            case 404 -> "Not Found";
+            case 500 -> "Error";
+            default -> "Unknown";
+        };
     }
     
-    // Code Smell: Switch statement without default
+    /**
+     * Process code with default case
+     * @param code the code to process
+     */
     public void processCode(int code) {
         switch (code) {
             case 1:
-                System.out.println("One");
+                LOGGER.info("One");
                 break;
             case 2:
-                System.out.println("Two");
+                LOGGER.info("Two");
                 break;
             case 3:
-                System.out.println("Three");
+                LOGGER.info("Three");
                 break;
-            // Missing default case
+            default:
+                LOGGER.info("Unknown code");
+                break;
         }
     }
     
-    // Code Smell: Cognitive complexity too high
-    public int calculateDiscount(int age, boolean isMember, boolean isHoliday, 
-                                  int purchaseAmount, boolean hasLoyaltyCard) {
+    /**
+     * Calculate discount with reduced complexity
+     * @param discountRequest the discount parameters
+     * @return total discount percentage
+     */
+    public int calculateDiscount(DiscountRequest discountRequest) {
         int discount = 0;
         
-        if (age > 65) {
-            discount += 10;
-            if (isMember) {
-                discount += 5;
-                if (hasLoyaltyCard) {
-                    discount += 5;
-                }
-            }
-        } else if (age < 18) {
-            discount += 5;
+        discount += calculateAgeDiscount(discountRequest);
+        discount += calculateMembershipDiscount(discountRequest);
+        discount += calculateHolidayDiscount(discountRequest);
+        
+        return discount;
+    }
+    
+    private int calculateAgeDiscount(DiscountRequest request) {
+        if (request.age >= SENIOR_AGE) {
+            return SENIOR_DISCOUNT;
+        } else if (request.age < MINOR_AGE) {
+            return MINOR_DISCOUNT;
+        }
+        return 0;
+    }
+    
+    private int calculateMembershipDiscount(DiscountRequest request) {
+        int discount = 0;
+        if (request.isMember) {
+            discount += MEMBER_DISCOUNT;
+        }
+        if (request.hasLoyaltyCard) {
+            discount += LOYALTY_DISCOUNT;
+        }
+        return discount;
+    }
+    
+    private int calculateHolidayDiscount(DiscountRequest request) {
+        if (!request.isHoliday) {
+            return 0;
         }
         
-        if (isHoliday) {
-            discount += 15;
-            if (purchaseAmount > 100) {
-                discount += 10;
-                if (purchaseAmount > 500) {
-                    discount += 20;
-                }
-            }
-        }
+        int discount = HOLIDAY_DISCOUNT;
         
-        if (isMember && hasLoyaltyCard) {
-            discount += 5;
+        if (request.purchaseAmount > VERY_HIGH_PURCHASE_THRESHOLD) {
+            discount += VERY_HIGH_PURCHASE_DISCOUNT;
+        } else if (request.purchaseAmount > HIGH_PURCHASE_THRESHOLD) {
+            discount += HIGH_PURCHASE_DISCOUNT;
         }
         
         return discount;
     }
     
-    // Code Smell: Method naming convention violation
-    public void DoSomething() {  // Should be doSomething
-        System.out.println("Bad naming");
+    /**
+     * Proper naming convention
+     */
+    public void doSomething() {
+        LOGGER.info("Performing action with proper naming");
     }
     
-    // Code Smell: Commented out code
+    /**
+     * Process without commented code
+     */
     public void process() {
-        System.out.println("Active code");
-        // System.out.println("Old implementation");
-        // for (int i = 0; i < 10; i++) {
-        //     System.out.println(i);
-        // }
-        // calculateOldWay();
+        LOGGER.info("Active code executing");
     }
     
-    // Code Smell: String concatenation in loop
+    /**
+     * Build string efficiently using StringBuilder
+     * @param items the items to concatenate
+     * @return concatenated string
+     */
     public String buildString(List<String> items) {
-        String result = "";
-        for (String item : items) {
-            result = result + item + ", ";  // Use StringBuilder instead
+        if (items == null || items.isEmpty()) {
+            return "";
         }
-        return result;
+        
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < items.size(); i++) {
+            result.append(items.get(i));
+            if (i < items.size() - 1) {
+                result.append(", ");
+            }
+        }
+        return result.toString();
     }
     
-    // Code Smell: Identical branches
-    public void identicalBranches(boolean condition) {
+    /**
+     * No identical branches
+     */
+    public void handleCondition(boolean condition) {
         if (condition) {
-            System.out.println("Same action");
-            System.out.println("More same action");
+            LOGGER.info("Condition is true");
         } else {
-            System.out.println("Same action");
-            System.out.println("More same action");
+            LOGGER.info("Condition is false");
+        }
+    }
+    
+    /**
+     * Discount request data class
+     */
+    public static class DiscountRequest {
+        public final int age;
+        public final boolean isMember;
+        public final boolean isHoliday;
+        public final int purchaseAmount;
+        public final boolean hasLoyaltyCard;
+        
+        public DiscountRequest(int age, boolean isMember, boolean isHoliday, 
+                             int purchaseAmount, boolean hasLoyaltyCard) {
+            this.age = age;
+            this.isMember = isMember;
+            this.isHoliday = isHoliday;
+            this.purchaseAmount = purchaseAmount;
+            this.hasLoyaltyCard = hasLoyaltyCard;
         }
     }
 }
