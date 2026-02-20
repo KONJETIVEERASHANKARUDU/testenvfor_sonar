@@ -30,6 +30,10 @@ jobs:
         run: mvn clean compile -DskipTests
         continue-on-error: true
       
+      - name: Run Tests with Coverage
+        run: mvn test
+        continue-on-error: true
+      
       - name: Download and Install SonarScanner CLI 6.2 (Latest Stable)
         run: |
           wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
