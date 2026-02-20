@@ -30,17 +30,20 @@ jobs:
         run: mvn clean compile -DskipTests
         continue-on-error: true
       
-      - name: Download and Install SonarScanner CLI 10.8
+      - name: Download and Install SonarScanner CLI 6.2 (Latest Stable)
         run: |
-          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.8.0.4302.zip
-          unzip -q sonar-scanner-cli-10.8.0.4302.zip
-          mv sonar-scanner-10.8.0.4302 sonar-scanner
+          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          unzip -q sonar-scanner-cli-6.2.1.4610-linux-x64.zip
+          mv sonar-scanner-6.2.1.4610-linux-x64 sonar-scanner
           echo "$GITHUB_WORKSPACE/sonar-scanner/bin" >> $GITHUB_PATH
+      
+      - name: Verify SonarScanner Version
+        run: sonar-scanner --version
       
       - name: Run SonarQube Analysis
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY || 'KONJETIVEERASHANKARUDU_testenvfor_sonar' }} \
+            -Dsonar.projectKey=KONJETIVEERASHANKARUDU_testenvfor_sonar \
             -Dsonar.organization=konjetiveerashankarudu \
             -Dsonar.sources=src/main/java \
             -Dsonar.java.binaries=target/classes \
