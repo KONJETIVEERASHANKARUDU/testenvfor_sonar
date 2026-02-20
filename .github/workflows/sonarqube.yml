@@ -30,8 +30,22 @@ jobs:
         run: mvn clean compile -DskipTests
         continue-on-error: true
       
-      - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@master  # Use latest for Scanner CLI 10.x
+      - name: Download and Install SonarScanner CLI 10.8
+        run: |
+          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-10.8.0.4302.zip
+          unzip -q sonar-scanner-cli-10.8.0.4302.zip
+          mv sonar-scanner-10.8.0.4302 sonar-scanner
+          echo "$GITHUB_WORKSPACE/sonar-scanner/bin" >> $GITHUB_PATH
+      
+      - name: Run SonarQube Analysis
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY || 'KONJETIVEERASHANKARUDU_testenvfor_sonar' }} \
+            -Dsonar.organization=konjetiveerashankarudu \
+            -Dsonar.sources=src/main/java \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
