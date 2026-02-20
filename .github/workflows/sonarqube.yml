@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
       
       - name: SonarQube Scan
-        uses: sonarsource/sonarqube-scan-action@v3.0.0  # Upgraded to v3 for Scanner CLI 10.x
+        uses: sonarsource/sonarqube-scan-action@master  # Use latest for Scanner CLI 10.x
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -39,7 +39,7 @@ jobs:
       # Optional: Check the Quality Gate status
       - name: SonarQube Quality Gate check
         id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@v1.1.0  # Pinned to stable version
+        uses: sonarsource/sonarqube-quality-gate-action@master  # Use latest
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
