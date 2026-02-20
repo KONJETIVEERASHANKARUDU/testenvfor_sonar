@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonarQube Server Upgrade Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #2193b0;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2193b0;
+            padding-bottom: 10px;
+        }
+        
+        .section h3 {
+            color: #0277bd;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        
+        .warning-box {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box h4 {
+            color: #e65100;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .important-box {
+            background: #ffebee;
+            border-left: 5px solid #f44336;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .important-box h4 {
+            color: #c62828;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .success-box {
+            background: #e8f5e9;
+            border-left: 5px solid #4CAF50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .success-box h4 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box h4 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .code-block {
+            background: #263238;
+            color: #aed581;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .code-block code {
+            display: block;
+            line-height: 1.8;
+        }
+        
+        .code-title {
+            background: #37474f;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        .steps {
+            counter-reset: step-counter;
+            list-style: none;
+        }
+        
+        .steps li {
+            counter-increment: step-counter;
+            padding: 20px;
+            margin: 15px 0;
+            background: #f5f5f5;
+            border-left: 5px solid #2193b0;
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .steps li::before {
+            content: counter(step-counter);
+            background: #2193b0;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .version-table th {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .version-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .version-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .method-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .method-card h3 {
+            color: #2193b0;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        
+        footer {
+            background: #263238;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 SonarQube Server Upgrade Guide</h1>
+            <p>Complete Step-by-Step Instructions</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Updated: February 20, 2026</p>
+        </header>
+        
+        <div class="content">
+            <!-- Important Notice -->
+            <div class="important-box">
+                <h4>⚠️ IMPORTANT: This Guide is for SonarQube Server Only</h4>
+                <p style="font-size: 1.1em;">If you're using <strong>SonarCloud</strong> (like your current setup), you <strong>DO NOT</strong> need to upgrade anything. SonarCloud is automatically updated by SonarSource.</p>
+                <p style="margin-top: 10px;">This guide is for organizations running <strong>self-hosted SonarQube Server</strong>.</p>
+            </div>
+            
+            <!-- Version Information -->
+            <div class="section">
+                <h2>📊 SonarQube Server Versions (February 2026)</h2>
+                
+                <table class="version-table">
+                    <tr>
+                        <th>Version</th>
+                        <th>Type</th>
+                        <th>Release Date</th>
+                        <th>Status</th>
+                        <th>Recommended For</th>
+                    </tr>
+                    <tr>
+                        <td><strong>9.9 LTS</strong></td>
+                        <td>Long Term Support</td>
+                        <td>2023</td>
+                        <td>✅ Stable</td>
+                        <td>Production (conservative)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>10.0 - 10.7</strong></td>
+                        <td>Standard</td>
+                        <td>2024-2025</td>
+                        <td>✅ Stable</td>
+                        <td>Mid-cycle versions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>10.8</strong></td>
+                        <td>Latest</td>
+                        <td>Early 2026</td>
+                        <td>✅ Latest</td>
+                        <td>Latest features</td>
+                    </tr>
+                    <tr>
+                        <td><strong>11.0</strong></td>
+                        <td>Future</td>
+                        <td>Expected 2026</td>
+                        <td>🔜 Coming Soon</td>
+                        <td>Wait for release</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Prerequisites -->
+            <div class="section">
+                <h2>✅ Before You Start</h2>
+                
+                <div class="warning-box">
+                    <h4>🔍 Prerequisites Checklist</h4>
+                    <ul>
+                        <li>✅ Check current SonarQube version</li>
+                        <li>✅ Review <a href="https://docs.sonarqube.org/latest/setup/upgrade-notes/" target="_blank">upgrade notes</a> for target version</li>
+                        <li>✅ Verify Java version compatibility</li>
+                        <li>✅ Check database compatibility</li>
+                        <li>✅ Ensure adequate disk space</li>
+                        <li>✅ Plan maintenance window</li>
+                        <li>✅ Notify users of downtime</li>
+                    </ul>
+                </div>
+                
+                <h3>Java Version Requirements</h3>
+                <table class="version-table">
+                    <tr>
+                        <th>SonarQube Version</th>
+                        <th>Minimum Java Version</th>
+                        <th>Recommended</th>
+                    </tr>
+                    <tr>
+                        <td>9.9 LTS</td>
+                        <td>Java 11</td>
+                        <td>Java 17</td>
+                    </tr>
+                    <tr>
+                        <td>10.0 - 10.8</td>
+                        <td>Java 17</td>
+                        <td>Java 17 or 21</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <!-- Backup Section -->
+            <div class="section">
+                <h2>💾 Step 1: Backup Everything</h2>
+                
+                <div class="important-box">
+                    <h4>🚨 CRITICAL: Always Backup First!</h4>
+                    <p>Never upgrade without a complete backup. This is your safety net if anything goes wrong.</p>
+                </div>
+                
+                <h3>What to Backup:</h3>
+                <ol class="steps">
+                    <li>
+                        <strong>Database Backup</strong>
+                        <div class="code-title">PostgreSQL Example</div>
+                        <div class="code-block">
+                            <code># Backup PostgreSQL database
+pg_dump -U sonarqube -d sonarqube -Fc -f sonarqube_backup_$(date +%Y%m%d).dump
+
+# Verify backup exists
+ls -lh sonarqube_backup_*.dump</code>
+                        </div>
+                        
+                        <div class="code-title">MySQL Example</div>
+                        <div class="code-block">
+                            <code># Backup MySQL database
+mysqldump -u sonarqube -p sonarqube > sonarqube_backup_$(date +%Y%m%d).sql
+
+# Compress backup
+gzip sonarqube_backup_*.sql</code>
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <strong>SonarQube Configuration</strong>
+                        <div class="code-block">
+                            <code># Backup entire SonarQube directory
+tar -czf sonarqube_files_backup_$(date +%Y%m%d).tar.gz /opt/sonarqube/
+
+# Backup just conf directory
+cp -r /opt/sonarqube/conf /backup/sonarqube_conf_$(date +%Y%m%d)</code>
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <strong>Plugins Directory</strong>
+                        <div class="code-block">
+                            <code># Backup plugins
+cp -r /opt/sonarqube/extensions/plugins /backup/plugins_$(date +%Y%m%d)</code>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+            <!-- Upgrade Methods -->
+            <div class="section">
+                <h2>🔄 Step 2: Choose Upgrade Method</h2>
+                
+                <!-- Method 1: Zip/Package -->
+                <div class="method-card">
+                    <h3>Method 1: ZIP/Package Upgrade (Traditional)</h3>
+                    
+                    <ol class="steps">
+                        <li>
+                            <strong>Download New Version</strong>
+                            <div class="code-block">
+                                <code># Download SonarQube 10.8 (example)
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.8.0.92393.zip
+
+# Unzip
+unzip sonarqube-10.8.0.92393.zip
+
+# Move to installation directory
+sudo mv sonarqube-10.8.0.92393 /opt/sonarqube-10.8</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Stop Current SonarQube</strong>
+                            <div class="code-block">
+                                <code># Stop SonarQube service
+sudo systemctl stop sonarqube
+
+# Or if running manually
+/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+
+# Verify it stopped
+ps aux | grep sonar</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Copy Configuration</strong>
+                            <div class="code-block">
+                                <code># Copy sonar.properties
+sudo cp /opt/sonarqube-old/conf/sonar.properties /opt/sonarqube-10.8/conf/
+
+# Copy plugins (if compatible)
+sudo cp -r /opt/sonarqube-old/extensions/plugins/* /opt/sonarqube-10.8/extensions/plugins/
+
+# Set permissions
+sudo chown -R sonarqube:sonarqube /opt/sonarqube-10.8</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Update Symlink (Optional but Recommended)</strong>
+                            <div class="code-block">
+                                <code># Remove old symlink
+sudo rm /opt/sonarqube
+
+# Create new symlink
+sudo ln -s /opt/sonarqube-10.8 /opt/sonarqube</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Start New Version</strong>
+                            <div class="code-block">
+                                <code># Start SonarQube
+sudo systemctl start sonarqube
+
+# Or manually
+/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+
+# Check logs
+tail -f /opt/sonarqube/logs/sonar.log</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Database Migration (Automatic)</strong>
+                            <p>Navigate to: <code>http://your-server:9000/setup</code></p>
+                            <p>Click "Migrate Database" button and wait for completion.</p>
+                        </li>
+                    </ol>
+                </div>
+                
+                <!-- Method 2: Docker -->
+                <div class="method-card">
+                    <h3>Method 2: Docker Upgrade (Recommended)</h3>
+                    
+                    <ol class="steps">
+                        <li>
+                            <strong>Stop Current Container</strong>
+                            <div class="code-block">
+                                <code># Stop and remove old container
+docker stop sonarqube
+docker rm sonarqube</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Pull New Version</strong>
+                            <div class="code-block">
+                                <code># Pull new SonarQube image
+docker pull sonarqube:10.8-community</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Start New Container</strong>
+                            <div class="code-block">
+                                <code># Start with same volumes and settings
+docker run -d --name sonarqube \
+  -p 9000:9000 \
+  -e SONAR_JDBC_URL=jdbc:postgresql://db:5432/sonarqube \
+  -e SONAR_JDBC_USERNAME=sonarqube \
+  -e SONAR_JDBC_PASSWORD=yourpassword \
+  -v sonarqube_data:/opt/sonarqube/data \
+  -v sonarqube_extensions:/opt/sonarqube/extensions \
+  -v sonarqube_logs:/opt/sonarqube/logs \
+  sonarqube:10.8-community</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Check Logs</strong>
+                            <div class="code-block">
+                                <code># Follow container logs
+docker logs -f sonarqube
+
+# Wait for "SonarQube is operational"</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Database Migration</strong>
+                            <p>Navigate to: <code>http://your-server:9000/setup</code></p>
+                            <p>Click "Migrate Database"</p>
+                        </li>
+                    </ol>
+                </div>
+                
+                <!-- Method 3: Docker Compose -->
+                <div class="method-card">
+                    <h3>Method 3: Docker Compose Upgrade</h3>
+                    
+                    <ol class="steps">
+                        <li>
+                            <strong>Update docker-compose.yml</strong>
+                            <div class="code-title">docker-compose.yml</div>
+                            <div class="code-block">
+                                <code>version: "3"
+
+services:
+  sonarqube:
+    image: sonarqube:10.8-community  # ← Change version here
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonarqube
+      SONAR_JDBC_PASSWORD: sonarqube
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: sonarqube
+      POSTGRES_PASSWORD: sonarqube
+      POSTGRES_DB: sonarqube
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:</code>
+                            </div>
+                        </li>
+                        
+                        <li>
+                            <strong>Pull and Restart</strong>
+                            <div class="code-block">
+                                <code># Stop services
+docker-compose down
+
+# Pull new images
+docker-compose pull
+
+# Start services
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f sonarqube</code>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Post-Upgrade -->
+            <div class="section">
+                <h2>✅ Step 3: Post-Upgrade Verification</h2>
+                
+                <ol class="steps">
+                    <li>
+                        <strong>Check SonarQube Status</strong>
+                        <div class="code-block">
+                            <code># Check if SonarQube is running
+curl http://localhost:9000/api/system/status
+
+# Expected response:
+# {"status":"UP","version":"10.8.0.92393"}</code>
+                        </div>
+                    </li>
+                    
+                    <li>
+                        <strong>Login to Web Interface</strong>
+                        <p>Navigate to: <code>http://your-server:9000</code></p>
+                        <p>Login with admin credentials</p>
+                    </li>
+                    
+                    <li>
+                        <strong>Verify Version</strong>
+                        <p>Go to: Administration → System → System Info</p>
+                        <p>Confirm new version is displayed</p>
+                    </li>
+                    
+                    <li>
+                        <strong>Check Plugins</strong>
+                        <p>Go to: Administration → Marketplace</p>
+                        <p>Verify all plugins are compatible and updated</p>
+                    </li>
+                    
+                    <li>
+                        <strong>Test Analysis</strong>
+                        <div class="code-block">
+                            <code># Run a test scan
+sonar-scanner \
+  -Dsonar.projectKey=test \
+  -Dsonar.sources=. \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=your-token</code>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+            
+            <!-- Troubleshooting -->
+            <div class="section">
+                <h2>🔧 Troubleshooting Common Issues</h2>
+                
+                <div class="warning-box">
+                    <h4>❌ Issue: Database Migration Fails</h4>
+                    <strong>Solution:</strong>
+                    <ol>
+                        <li>Check database compatibility</li>
+                        <li>Ensure sufficient disk space</li>
+                        <li>Check logs: <code>/opt/sonarqube/logs/sonar.log</code></li>
+                        <li>Restore backup and try again</li>
+                    </ol>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>❌ Issue: Plugins Not Working</h4>
+                    <strong>Solution:</strong>
+                    <ol>
+                        <li>Check plugin compatibility with new version</li>
+                        <li>Update plugins from Marketplace</li>
+                        <li>Remove incompatible plugins</li>
+                        <li>Restart SonarQube</li>
+                    </ol>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>❌ Issue: Java Version Error</h4>
+                    <strong>Solution:</strong>
+                    <div class="code-block">
+                        <code># Check Java version
+java -version
+
+# Update Java if needed (Ubuntu/Debian)
+sudo apt update
+sudo apt install openjdk-17-jdk
+
+# Verify
+java -version</code>
+                    </div>
+                </div>
+                
+                <div class="important-box">
+                    <h4>🆘 If All Else Fails: Rollback</h4>
+                    <div class="code-block">
+                        <code># Stop new version
+sudo systemctl stop sonarqube
+
+# Restore database backup
+pg_restore -U sonarqube -d sonarqube sonarqube_backup_20260220.dump
+
+# Switch back to old version
+sudo rm /opt/sonarqube
+sudo ln -s /opt/sonarqube-old /opt/sonarqube
+
+# Start old version
+sudo systemctl start sonarqube</code>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upgrade Paths -->
+            <div class="section">
+                <h2>🛤️ Upgrade Paths</h2>
+                
+                <div class="info-box">
+                    <h4>📌 Direct Upgrade vs Multi-Step</h4>
+                    <p><strong>Direct upgrade allowed:</strong></p>
+                    <ul>
+                        <li>9.9 LTS → 10.8 ✅</li>
+                        <li>10.0 → 10.8 ✅</li>
+                        <li>10.5 → 10.8 ✅</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;"><strong>Multi-step required:</strong></p>
+                    <ul>
+                        <li>8.9 → 9.9 LTS → 10.8</li>
+                        <li>7.9 → 8.9 → 9.9 LTS → 10.8</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Best Practices -->
+            <div class="section">
+                <h2>💡 Best Practices</h2>
+                
+                <div class="success-box">
+                    <h4>✅ Upgrade Best Practices</h4>
+                    <ol>
+                        <li><strong>Test in Staging First:</strong> Never upgrade production directly</li>
+                        <li><strong>Read Release Notes:</strong> Always check what's new and what changed</li>
+                        <li><strong>Schedule Maintenance Window:</strong> Notify users in advance</li>
+                        <li><strong>Backup Everything:</strong> Database, config, plugins</li>
+                        <li><strong>Check Plugin Compatibility:</strong> Update or remove incompatible plugins</li>
+                        <li><strong>Monitor Logs:</strong> Watch for errors during and after upgrade</li>
+                        <li><strong>Test Thoroughly:</strong> Run sample analyses to verify functionality</li>
+                        <li><strong>Keep Old Version:</strong> Don't delete until new version is confirmed working</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <!-- Summary -->
+            <div class="section">
+                <h2>📝 Summary</h2>
+                
+                <div class="info-box">
+                    <h4>🔑 Key Points</h4>
+                    <ol style="font-size: 1.1em; line-height: 2;">
+                        <li><strong>Always backup first</strong> - database and files</li>
+                        <li><strong>Check compatibility</strong> - Java, database, plugins</li>
+                        <li><strong>Read upgrade notes</strong> for your target version</li>
+                        <li><strong>Use Docker</strong> if possible - easier rollback</li>
+                        <li><strong>Test in staging</strong> before production</li>
+                        <li><strong>Plan for downtime</strong> - typically 15-60 minutes</li>
+                        <li><strong>Verify everything</strong> after upgrade</li>
+                    </ol>
+                </div>
+                
+                <div class="success-box">
+                    <h4>🎯 Remember</h4>
+                    <p style="font-size: 1.2em;">If you're using <strong>SonarCloud</strong> (like your current setup), you don't need any of this! SonarCloud upgrades automatically with zero effort from you. 🎉</p>
+                </div>
+            </div>
+            
+            <!-- Resources -->
+            <div class="section">
+                <h2>📚 Additional Resources</h2>
+                
+                <ul style="font-size: 1.1em; line-height: 2;">
+                    <li><a href="https://docs.sonarqube.org/latest/setup/upgrading/" target="_blank">Official SonarQube Upgrade Documentation</a></li>
+                    <li><a href="https://docs.sonarqube.org/latest/setup/upgrade-notes/" target="_blank">Upgrade Notes by Version</a></li>
+                    <li><a href="https://www.sonarsource.com/products/sonarqube/downloads/" target="_blank">Download SonarQube</a></li>
+                    <li><a href="https://community.sonarsource.com/" target="_blank">SonarSource Community Forum</a></li>
+                    <li><a href="https://hub.docker.com/_/sonarqube" target="_blank">SonarQube Docker Images</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 | SonarQube Server Upgrade Guide</p>
+            <p style="margin-top: 10px; opacity: 0.8;">Last Updated: February 20, 2026</p>
+            <p style="margin-top: 5px; opacity: 0.8;">This guide is for SonarQube Server only. SonarCloud users do not need to upgrade.</p>
+        </footer>
+    </div>
+</body>
+</html>
