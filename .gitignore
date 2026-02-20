@@ -1,0 +1,39 @@
+# SonarQube
+.sonar/
+.scannerwork/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+target/
+out/
+*.class
+*.jar
+*.war
+
+# Environment variables
+.env
+.env.local
+
+# Coverage reports
+coverage/
+*.lcov
