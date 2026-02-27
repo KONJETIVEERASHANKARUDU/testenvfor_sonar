@@ -171,6 +171,12 @@ jobs:
           echo "**Run:** [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> /tmp/analysis-report.md
           echo "" >> /tmp/analysis-report.md
 
+          # Debug: Show what outputs we received
+          echo "DEBUG: build_failed output = '${{ steps.build-check.outputs.build_failed }}'"
+          echo "DEBUG: test_failed output = '${{ steps.test-check.outputs.test_failed }}'"
+          echo "DEBUG: build exit_code = '${{ steps.build-check.outputs.exit_code }}'"
+          echo "DEBUG: test exit_code = '${{ steps.test-check.outputs.exit_code }}'"
+
           # Check build failures
           BUILD_FAILED=false
           if [ "${{ steps.build-check.outputs.build_failed }}" == "true" ]; then
