@@ -127,12 +127,18 @@ jobs:
 
       - name: Build and capture failures
         id: build-check
-        run: mvn clean compile -DskipTests 2>&1 | tee /tmp/build-output.txt
+        run: |
+          mvn clean compile -DskipTests 2>&1 | tee /tmp/build-output.txt
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
         continue-on-error: true
 
       - name: Run tests and capture failures
         id: test-check
-        run: mvn test 2>&1 | tee /tmp/test-output.txt
+        run: |
+          mvn test 2>&1 | tee /tmp/test-output.txt
+          TEST_EXIT_CODE=$?
+          echo "exit_code=$TEST_EXIT_CODE" >> "$GITHUB_OUTPUT"
+          exit $TEST_EXIT_CODE
         continue-on-error: true
 
       - name: Download retry test reports
@@ -155,7 +161,7 @@ jobs:
 
           # Check build failures
           BUILD_FAILED=false
-          if [ "${{ steps.build-check.outcome }}" == "failure" ]; then
+          if [ "${{ steps.build-check.outcome }}" == "failure" ] || [ "${{ steps.build-check.outputs.exit_code }}" != "0" ]; then
             BUILD_FAILED=true
             echo "### ❌ Build Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
@@ -172,7 +178,7 @@ jobs:
 
           # Check test failures
           TEST_FAILED=false
-          if [ "${{ steps.test-check.outcome }}" == "failure" ]; then
+          if [ "${{ steps.test-check.outcome }}" == "failure" ] || [ "${{ steps.test-check.outputs.exit_code }}" != "0" ]; then
             TEST_FAILED=true
             echo "### ❌ Test Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
