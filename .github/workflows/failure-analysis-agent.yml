@@ -128,18 +128,30 @@ jobs:
       - name: Build and capture failures
         id: build-check
         run: |
+          set +e
           mvn clean compile -DskipTests 2>&1 | tee /tmp/build-output.txt
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
-        continue-on-error: true
+          BUILD_EXIT=$?
+          echo "exit_code=$BUILD_EXIT" >> "$GITHUB_OUTPUT"
+          if [ $BUILD_EXIT -ne 0 ]; then
+            echo "build_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
 
       - name: Run tests and capture failures
         id: test-check
         run: |
+          set +e
           mvn test 2>&1 | tee /tmp/test-output.txt
-          TEST_EXIT_CODE=$?
-          echo "exit_code=$TEST_EXIT_CODE" >> "$GITHUB_OUTPUT"
-          exit $TEST_EXIT_CODE
-        continue-on-error: true
+          TEST_EXIT=$?
+          echo "exit_code=$TEST_EXIT" >> "$GITHUB_OUTPUT"
+          if [ $TEST_EXIT -ne 0 ]; then
+            echo "test_failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "test_failed=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
 
       - name: Download retry test reports
         uses: actions/download-artifact@v4
@@ -161,7 +173,7 @@ jobs:
 
           # Check build failures
           BUILD_FAILED=false
-          if [ "${{ steps.build-check.outcome }}" == "failure" ] || [ "${{ steps.build-check.outputs.exit_code }}" != "0" ]; then
+          if [ "${{ steps.build-check.outputs.build_failed }}" == "true" ]; then
             BUILD_FAILED=true
             echo "### ❌ Build Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
@@ -178,7 +190,7 @@ jobs:
 
           # Check test failures
           TEST_FAILED=false
-          if [ "${{ steps.test-check.outcome }}" == "failure" ] || [ "${{ steps.test-check.outputs.exit_code }}" != "0" ]; then
+          if [ "${{ steps.test-check.outputs.test_failed }}" == "true" ]; then
             TEST_FAILED=true
             echo "### ❌ Test Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
