@@ -167,19 +167,14 @@ jobs:
           echo "" >> /tmp/analysis-report.md
           echo "**Branch:** \`${{ github.ref_name }}\`" >> /tmp/analysis-report.md
           echo "**Commit:** \`${{ github.sha }}\`" >> /tmp/analysis-report.md
-          echo "**Triggered by:** @${{ github.actor }}" >> /tmp/analysis-report.md
+          echo "** Triggered by:** @${{ github.actor }}" >> /tmp/analysis-report.md
           echo "**Run:** [View workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> /tmp/analysis-report.md
           echo "" >> /tmp/analysis-report.md
 
-          # Debug: Show what outputs we received
-          echo "DEBUG: build_failed output = '${{ steps.build-check.outputs.build_failed }}'"
-          echo "DEBUG: test_failed output = '${{ steps.test-check.outputs.test_failed }}'"
-          echo "DEBUG: build exit_code = '${{ steps.build-check.outputs.exit_code }}'"
-          echo "DEBUG: test exit_code = '${{ steps.test-check.outputs.exit_code }}'"
-
-          # Check build failures
+          # Check build failures by examining Maven output
           BUILD_FAILED=false
-          if [ "${{ steps.build-check.outputs.build_failed }}" == "true" ]; then
+          if grep -q "\[ERROR\].*BUILD FAILURE" /tmp/build-output.txt 2>/dev/null || \
+             grep -q "compilation failure" /tmp/build-output.txt 2>/dev/null; then
             BUILD_FAILED=true
             echo "### ❌ Build Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
@@ -194,9 +189,12 @@ jobs:
             echo "" >> /tmp/analysis-report.md
           fi
 
-          # Check test failures
+          # Check test failures by examining Maven output and reports
           TEST_FAILED=false
-          if [ "${{ steps.test-check.outputs.test_failed }}" == "true" ]; then
+          if grep -q "Tests run:.*Failures: [1-9]" /tmp/test-output.txt 2>/dev/null || \
+             grep -q "Tests run:.*Errors: [1-9]" /tmp/test-output.txt 2>/dev/null || \
+             grep -q "\[ERROR\] Tests run:" /tmp/test-output.txt 2>/dev/null || \
+             grep -q "BUILD FAILURE" /tmp/test-output.txt 2>/dev/null; then
             TEST_FAILED=true
             echo "### ❌ Test Failures" >> /tmp/analysis-report.md
             echo "" >> /tmp/analysis-report.md
