@@ -2,7 +2,7 @@ name: CI Failure Recovery Agent
 
 on:
   workflow_run:
-    workflows: ["Optimized CI/CD Pipeline"]
+    workflows: ["🚀 Optimized CI/CD Pipeline"]
     types:
       - completed
 
