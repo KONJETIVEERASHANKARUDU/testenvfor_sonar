@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Runner Intelligence - AI-Powered CI/CD Diagnostics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366F1;
+            --secondary-color: #8B5CF6;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --info-color: #3B82F6;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --bg-light: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --border-color: #E5E7EB;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.healthy {
+            background-color: var(--success-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value.success { color: var(--success-color); }
+        .stat-value.warning { color: var(--warning-color); }
+        .stat-value.danger { color: var(--danger-color); }
+        .stat-value.info { color: var(--info-color); }
+
+        .stat-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .stat-change.up { color: var(--success-color); }
+        .stat-change.down { color: var(--danger-color); }
+
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Runner Status */
+        .runner-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .runner-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            border-left: 4px solid var(--success-color);
+            transition: all 0.3s ease;
+        }
+
+        .runner-item:hover {
+            background-color: #E5E7EB;
+            transform: translateX(4px);
+            cursor: pointer;
+        }
+
+        .runner-item.unhealthy {
+            border-left-color: var(--danger-color);
+        }
+
+        .runner-item.degraded {
+            border-left-color: var(--warning-color);
+        }
+
+        .runner-icon {
+            font-size: 2rem;
+        }
+
+        .runner-details {
+            flex: 1;
+        }
+
+        .runner-name {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .runner-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .runner-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .runner-status.healthy {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .runner-status.degraded {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .runner-status.unhealthy {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* AI Diagnostics */
+        .ai-chat {
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 90%;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .message-content {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Issues List */
+        .issues-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .issue-item {
+            padding: 1rem;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            border-left: 4px solid var(--danger-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .issue-item:hover {
+            background-color: #E5E7EB;
+            transform: translateX(4px);
+        }
+
+        .issue-item.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .issue-severity {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .issue-severity.critical {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .issue-severity.warning {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .issue-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Telemetry Graph */
+        .telemetry-graph {
+            height: 300px;
+            background: linear-gradient(to bottom, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .graph-line {
+            height: 1px;
+            background-color: var(--border-color);
+        }
+
+        .graph-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            padding: 1rem;
+        }
+
+        .graph-bar {
+            width: 40px;
+            background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .graph-bar:hover {
+            opacity: 0.8;
+            transform: translateY(-4px);
+        }
+
+        /* Logs Viewer */
+        .logs-viewer {
+            background-color: #1F2937;
+            color: #F3F4F6;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-line {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .log-line:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-line.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-left: 3px solid var(--danger-color);
+            padding-left: 0.5rem;
+        }
+
+        .log-line.warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            border-left: 3px solid var(--warning-color);
+            padding-left: 0.5rem;
+        }
+
+        .log-timestamp {
+            color: #9CA3AF;
+            margin-right: 1rem;
+        }
+
+        /* Alert Box */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .alert.info {
+            background-color: #DBEAFE;
+            border-left: 4px solid var(--info-color);
+            color: #1E40AF;
+        }
+
+        .alert.warning {
+            background-color: #FEF3C7;
+            border-left: 4px solid var(--warning-color);
+            color: #92400E;
+        }
+
+        .alert.success {
+            background-color: #D1FAE5;
+            border-left: 4px solid var(--success-color);
+            color: #065F46;
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+        }
+
+        /* Solution Steps */
+        .solution-steps {
+            margin-top: 1.5rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 3rem;
+        }
+
+        .step::before {
+            content: '';
+            position: absolute;
+            left: 1.2rem;
+            top: 3rem;
+            bottom: -1.5rem;
+            width: 2px;
+            background-color: var(--border-color);
+        }
+
+        .step:last-child::before {
+            display: none;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background-color: #1F2937;
+            color: #F3F4F6;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            position: relative;
+            bottom: -2px;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .action-button {
+            padding: 1rem;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-weight: 600;
+        }
+
+        .action-button:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">🤖</span>
+                <div class="logo-text">
+                    <h1>Runner Intelligence</h1>
+                    <p>AI-Powered CI/CD Diagnostics & Troubleshooting</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <span class="status-dot healthy"></span>
+                    <span>All Systems Operational</span>
+                </div>
+                <button class="btn btn-primary" onclick="openAIDiagnostics()">
+                    🤖 AI Assistant
+                </button>
+                <button class="btn btn-secondary">
+                    👤 George Harley
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- AI Alert -->
+        <div class="alert info">
+            <span class="alert-icon">🤖</span>
+            <div class="alert-content">
+                <div class="alert-title">AI Monitoring Active</div>
+                <div>Runner Intelligence is continuously monitoring your CI/CD infrastructure and will alert you to potential issues before they impact your builds.</div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Active Runners</div>
+                <div class="stat-value success">24</div>
+                <div class="stat-change up">↗ +2 since yesterday</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Healthy Status</div>
+                <div class="stat-value success">95.8%</div>
+                <div class="stat-change up">↗ +2.3% this week</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Active Issues</div>
+                <div class="stat-value warning">3</div>
+                <div class="stat-change down">↘ -2 resolved today</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Avg Response Time</div>
+                <div class="stat-value info">1.2s</div>
+                <div class="stat-change up">↗ 15% faster</div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Left Column -->
+            <div>
+                <!-- Runner Status -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>🖥️</span>
+                            <span>Runner Status</span>
+                        </div>
+                        <button class="btn btn-primary" onclick="refreshRunners()">Refresh</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="runner-list" id="runnerList"></div>
+                    </div>
+                </div>
+
+                <!-- Telemetry -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>📊</span>
+                            <span>Real-Time Telemetry</span>
+                        </div>
+                        <div class="tabs" style="border-bottom: none; margin-bottom: 0;">
+                            <button class="tab active">CPU</button>
+                            <button class="tab">Memory</button>
+                            <button class="tab">Network</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="telemetry-graph">
+                            <div class="graph-grid">
+                                <div class="graph-line"></div>
+                                <div class="graph-line"></div>
+                                <div class="graph-line"></div>
+                                <div class="graph-line"></div>
+                            </div>
+                            <div class="graph-content" id="telemetryGraph"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- Active Issues -->
+                <div class="card" style="margin-bottom: 2rem;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>⚠️</span>
+                            <span>Active Issues</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="issues-list" id="issuesList"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span>⚡</span>
+                            <span>Quick Actions</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="quick-actions">
+                            <button class="action-button" onclick="openAIDiagnostics()">
+                                <div class="action-icon">🤖</div>
+                                <div>Ask AI</div>
+                            </button>
+                            <button class="action-button" onclick="viewLogs()">
+                                <div class="action-icon">📄</div>
+                                <div>View Logs</div>
+                            </button>
+                            <button class="action-button" onclick="restartRunner()">
+                                <div class="action-icon">🔄</div>
+                                <div>Restart Runner</div>
+                            </button>
+                            <button class="action-button" onclick="exportMetrics()">
+                                <div class="action-icon">📊</div>
+                                <div>Export Metrics</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Diagnostics Modal -->
+    <div class="modal" id="aiModal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <div>
+                    <h2>🤖 AI Diagnostics Assistant</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                        Ask me anything about your runners, builds, or CI/CD issues
+                    </p>
+                </div>
+                <button class="modal-close" onclick="closeModal('aiModal')">✕</button>
+            </div>
+
+            <div class="card-body">
+                <div class="ai-chat">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            <div class="message-avatar">🤖</div>
+                            <div>
+                                <div class="message-content">
+                                    👋 Hi! I'm your AI diagnostics assistant. I can help you:
+                                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                        <li>Diagnose runner issues</li>
+                                        <li>Analyze build failures</li>
+                                        <li>Suggest optimizations</li>
+                                        <li>Explain error messages</li>
+                                        <li>Provide troubleshooting steps</li>
+                                    </ul>
+                                    What can I help you with today?
+                                </div>
+                                <div class="message-time">Just now</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask anything... e.g., 'Why is runner-prod-03 failing?'">
+                        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Issue Detail Modal -->
+    <div class="modal" id="issueModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="issueTitle">Issue Details</h2>
+                    <span id="issueSeverity"></span>
+                </div>
+                <button class="modal-close" onclick="closeModal('issueModal')">✕</button>
+            </div>
+
+            <div class="card-body">
+                <div class="alert warning">
+                    <span class="alert-icon">🤖</span>
+                    <div class="alert-content">
+                        <div class="alert-title">AI Analysis Complete</div>
+                        <div id="aiAnalysis">This issue has been analyzed by AI and we've identified a potential solution.</div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 1rem;">Description</h3>
+                <p id="issueDescription" style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;"></p>
+
+                <h3 style="margin-bottom: 1rem;">Recent Logs</h3>
+                <div class="logs-viewer" id="issueLogs"></div>
+
+                <h3 style="margin: 2rem 0 1rem 0;">AI-Recommended Solution</h3>
+                <div class="solution-steps" id="solutionSteps"></div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="closeModal('issueModal')">Close</button>
+                    <button class="btn btn-primary" onclick="openAIDiagnostics()">Ask AI for More Help</button>
+                    <button class="btn btn-success" onclick="markResolved()">Mark as Resolved</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample Data
+        const runners = [
+            { id: 1, name: 'runner-prod-01', status: 'healthy', cpu: 45, memory: 62, jobs: 12, region: 'us-east-1' },
+            { id: 2, name: 'runner-prod-02', status: 'healthy', cpu: 38, memory: 55, jobs: 8, region: 'us-east-1' },
+            { id: 3, name: 'runner-prod-03', status: 'degraded', cpu: 89, memory: 91, jobs: 15, region: 'us-west-2' },
+            { id: 4, name: 'runner-staging-01', status: 'healthy', cpu: 22, memory: 48, jobs: 5, region: 'us-east-1' },
+            { id: 5, name: 'runner-dev-01', status: 'unhealthy', cpu: 5, memory: 15, jobs: 0, region: 'eu-west-1' },
+        ];
+
+        const issues = [
+            {
+                id: 1,
+                title: 'High Memory Usage on runner-prod-03',
+                severity: 'warning',
+                description: 'Runner experiencing memory pressure - could impact build performance',
+                runner: 'runner-prod-03',
+                detected: '5 minutes ago',
+                analysis: 'AI detected a memory leak in one of your build processes. The Java heap size is set too low for the current workload.',
+                logs: [
+                    { level: 'warning', time: '14:23:15', message: 'Memory usage at 91% - consider increasing heap size' },
+                    { level: 'error', time: '14:23:45', message: 'OutOfMemoryError: Java heap space in maven-build-job' },
+                    { level: 'info', time: '14:24:00', message: 'Build job retrying with increased memory allocation' }
+                ],
+                solution: [
+                    { title: 'Increase Java Heap Size', description: 'Update your Maven configuration to allocate more memory', code: 'export MAVEN_OPTS="-Xmx4096m -Xms2048m"' },
+                    { title: 'Add Memory Limits to CI Config', description: 'Set resource limits in your pipeline configuration', code: 'resources:\n  limits:\n    memory: 4Gi' },
+                    { title: 'Monitor for Resolution', description: 'Check if builds complete successfully with new settings' }
+                ]
+            },
+            {
+                id: 2,
+                title: 'Runner Connectivity Issues',
+                severity: 'critical',
+                description: 'runner-dev-01 has lost connection to GitHub - no jobs being processed',
+                runner: 'runner-dev-01',
+                detected: '15 minutes ago',
+                analysis: 'The runner lost connection to GitHub Actions. This is likely due to network issues or the runner service crashing.',
+                logs: [
+                    { level: 'error', time: '14:10:32', message: 'Connection to GitHub API failed - timeout after 30s' },
+                    { level: 'error', time: '14:11:05', message: 'Runner service crashed with exit code 1' },
+                    { level: 'info', time: '14:11:10', message: 'Automatic restart initiated by watchdog' }
+                ],
+                solution: [
+                    { title: 'Restart Runner Service', description: 'SSH into the runner and restart the service', code: 'sudo systemctl restart actions-runner' },
+                    { title: 'Check Network Connectivity', description: 'Verify the runner can reach GitHub', code: 'curl -I https://api.github.com' },
+                    { title: 'Review Runner Logs', description: 'Check for any error patterns', code: 'tail -f /var/log/actions-runner/runner.log' }
+                ]
+            },
+            {
+                id: 3,
+                title: 'Build Queue Backlog',
+                severity: 'warning',
+                description: 'Job queue growing - average wait time increased by 200%',
+                runner: 'All runners',
+                detected: '1 hour ago',
+                analysis: 'Your runners are at capacity. Consider scaling up or optimizing build times.',
+                logs: [
+                    { level: 'warning', time: '13:15:00', message: 'Queue depth: 45 jobs waiting' },
+                    { level: 'info', time: '13:30:00', message: 'Average queue wait time: 8 minutes' },
+                    { level: 'warning', time: '14:00:00', message: 'Queue depth increased to 67 jobs' }
+                ],
+                solution: [
+                    { title: 'Scale Runner Pool', description: 'Add more runners to handle the load', code: 'terraform apply -var="runner_count=30"' },
+                    { title: 'Optimize Build Times', description: 'Review and cache dependencies', code: '# Add to your workflow\nuses: actions/cache@v3' },
+                    { title: 'Implement Build Priority', description: 'Prioritize critical builds using labels' }
+                ]
+            }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRunners();
+            renderIssues();
+            renderTelemetry();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                renderRunners();
+                renderTelemetry();
+            }, 30000);
+
+            // Chat input enter key
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+
+        // Render Runners
+        function renderRunners() {
+            const container = document.getElementById('runnerList');
+            container.innerHTML = runners.map(runner => `
+                <div class="runner-item ${runner.status}" onclick="showRunnerDetail(${runner.id})">
+                    <span class="runner-icon">${runner.status === 'healthy' ? '✅' : runner.status === 'degraded' ? '⚠️' : '❌'}</span>
+                    <div class="runner-details">
+                        <div class="runner-name">${runner.name}</div>
+                        <div class="runner-meta">
+                            <span>💻 CPU: ${runner.cpu}%</span>
+                            <span>🧠 Memory: ${runner.memory}%</span>
+                            <span>⚡ Jobs: ${runner.jobs}</span>
+                            <span>🌍 ${runner.region}</span>
+                        </div>
+                    </div>
+                    <span class="runner-status ${runner.status}">${runner.status}</span>
+                </div>
+            `).join('');
+        }
+
+        // Render Issues
+        function renderIssues() {
+            const container = document.getElementById('issuesList');
+            container.innerHTML = issues.map(issue => `
+                <div class="issue-item ${issue.severity}" onclick="showIssueDetail(${issue.id})">
+                    <div class="issue-header">
+                        <div class="issue-title">${issue.title}</div>
+                        <span class="issue-severity ${issue.severity}">${issue.severity}</span>
+                    </div>
+                    <div class="issue-description">${issue.description}</div>
+                    <div class="issue-meta">
+                        <span>🖥️ ${issue.runner}</span>
+                        <span>🕐 ${issue.detected}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Telemetry
+        function renderTelemetry() {
+            const container = document.getElementById('telemetryGraph');
+            const data = [65, 75, 70, 85, 80, 78, 82, 88, 85, 90, 87, 92];
+            const max = Math.max(...data);
+            
+            container.innerHTML = data.map(value => {
+                const height = (value / max) * 100;
+                return `<div class="graph-bar" style="height: ${height}%;" title="${value}%"></div>`;
+            }).join('');
+        }
+
+        // Show Runner Detail
+        function showRunnerDetail(runnerId) {
+            const runner = runners.find(r => r.id === runnerId);
+            alert(`Runner: ${runner.name}\nStatus: ${runner.status}\nCPU: ${runner.cpu}%\nMemory: ${runner.memory}%`);
+        }
+
+        // Show Issue Detail
+        function showIssueDetail(issueId) {
+            const issue = issues.find(i => i.id === issueId);
+            
+            document.getElementById('issueTitle').textContent = issue.title;
+            document.getElementById('issueSeverity').innerHTML = `<span class="issue-severity ${issue.severity}">${issue.severity}</span>`;
+            document.getElementById('aiAnalysis').textContent = issue.analysis;
+            document.getElementById('issueDescription').textContent = issue.description;
+            
+            // Render logs
+            const logsContainer = document.getElementById('issueLogs');
+            logsContainer.innerHTML = issue.logs.map(log => `
+                <div class="log-line ${log.level}">
+                    <span class="log-timestamp">${log.time}</span>
+                    <span>[${log.level.toUpperCase()}]</span>
+                    <span>${log.message}</span>
+                </div>
+            `).join('');
+            
+            // Render solution steps
+            const stepsContainer = document.getElementById('solutionSteps');
+            stepsContainer.innerHTML = issue.solution.map((step, index) => `
+                <div class="step">
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-description">${step.description}</div>
+                        ${step.code ? `<div class="code-block">${step.code}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('issueModal').classList.add('active');
+        }
+
+        // AI Chat
+        function openAIDiagnostics() {
+            document.getElementById('aiModal').classList.add('active');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML += `
+                <div class="message user">
+                    <div class="message-avatar">👤</div>
+                    <div>
+                        <div class="message-content">${message}</div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+            `;
+            
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const responses = {
+                    'runner': '🔍 I found that runner-prod-03 is experiencing high memory usage (91%). The primary cause is a Java heap space issue in your Maven builds. I recommend increasing the MAVEN_OPTS heap size to 4GB. Would you like me to walk you through the fix?',
+                    'build': '📊 Your current build queue has 67 jobs waiting. The average wait time has increased to 8 minutes. I suggest scaling your runner pool from 24 to 30 runners to handle this load. Shall I help you with the Terraform configuration?',
+                    'failure': '💡 I analyzed your recent build failures. 85% are caused by intermittent network timeouts when downloading dependencies. I recommend implementing dependency caching using actions/cache@v3. This should reduce failures by ~70%.',
+                    'default': `🤖 I understand you're asking about "${message}". Let me analyze your infrastructure... Based on current telemetry, your runners are performing well overall. However, I notice runner-prod-03 needs attention. Would you like me to provide detailed diagnostics for a specific runner?`
+                };
+                
+                let response = responses.default;
+                for (let key in responses) {
+                    if (message.toLowerCase().includes(key)) {
+                        response = responses[key];
+                        break;
+                    }
+                }
+                
+                messagesContainer.innerHTML += `
+                    <div class="message ai">
+                        <div class="message-avatar">🤖</div>
+                        <div>
+                            <div class="message-content">${response}</div>
+                            <div class="message-time">Just now</div>
+                        </div>
+                    </div>
+                `;
+                
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+        }
+
+        // Quick Actions
+        function refreshRunners() {
+            alert('Refreshing runner status...');
+            renderRunners();
+        }
+
+        function viewLogs() {
+            alert('Opening centralized logs viewer...');
+        }
+
+        function restartRunner() {
+            alert('Restarting selected runner... This will be automated via webhook in production.');
+        }
+
+        function exportMetrics() {
+            alert('Exporting metrics to CSV...');
+        }
+
+        function markResolved() {
+            alert('Issue marked as resolved! AI will continue monitoring to ensure it doesn\'t recur.');
+            closeModal('issueModal');
+        }
+
+        // Modal Management
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modals on background click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal(this.id);
+                }
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

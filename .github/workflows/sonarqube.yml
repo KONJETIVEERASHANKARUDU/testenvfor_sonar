@@ -1,4 +1,4 @@
-name: SonarQube Analysis
+name: SonarQube Multi-Language Analysis
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   sonarqube:
-    name: SonarQube Scan
+    name: SonarQube Multi-Language Scan
     runs-on: ubuntu-latest
     
     steps:
@@ -20,17 +20,52 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for better analysis relevancy
       
+      # Java Setup
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
       
+      # Node.js Setup (for JavaScript/TypeScript)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      # Python Setup
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      # Go Setup
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      
+      # Install language-specific dependencies
+      - name: Install Node.js dependencies (if package.json exists)
+        run: |
+          if [ -f "package.json" ]; then
+            npm install
+          fi
+        continue-on-error: true
+      
+      - name: Install Python dependencies (if requirements.txt exists)
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+        continue-on-error: true
+      
+      # Java Build & Test
       - name: Build with Maven
         run: mvn clean compile -DskipTests
         continue-on-error: true
       
-      - name: Run Tests with Coverage
+      - name: Run Java Tests with Coverage
         run: mvn test
         continue-on-error: true
       
@@ -44,13 +79,24 @@ jobs:
       - name: Verify SonarScanner Version
         run: sonar-scanner --version
       
-      - name: Run SonarQube Analysis
+      - name: Run Multi-Language SonarQube Analysis
         run: |
           sonar-scanner \
             -Dsonar.projectKey=KONJETIVEERASHANKARUDU_testenvfor_sonar \
             -Dsonar.organization=konjetiveerashankarudu \
-            -Dsonar.sources=src/main/java \
+            -Dsonar.sources=. \
+            -Dsonar.exclusions=**/target/**,**/node_modules/**,**/dist/**,**/build/**,**/.git/**,**/.idea/**,**/.vscode/**,**/coverage/**,**/*.min.js,**/*.min.css \
+            -Dsonar.tests=src/test \
             -Dsonar.java.binaries=target/classes \
+            -Dsonar.java.test.binaries=target/test-classes \
+            -Dsonar.java.source=21 \
+            -Dsonar.javascript.node.maxspace=4096 \
+            -Dsonar.typescript.tsconfigPath=tsconfig.json \
+            -Dsonar.python.version=3.8,3.9,3.10,3.11,3.12 \
+            -Dsonar.go.coverage.reportPaths=coverage.out \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.coverage.exclusions=**/test/**,**/tests/**,**/*Test.java,**/*Spec.ts,**/*test.py \
+            -Dsonar.cpd.exclusions=**/test/**,**/tests/** \
             -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
         env:

@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media App - User Stories & Acceptance Criteria</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 4px solid #3498db;
+            padding-bottom: 1rem;
+        }
+
+        .doc-info {
+            background: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .doc-info p {
+            margin: 0.5rem 0;
+            font-weight: 600;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin: 3rem 0 1rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 6px;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.4rem;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .user-story {
+            background: #e3f2fd;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            border-left: 5px solid #2196f3;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .user-story strong {
+            color: #1976d2;
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tbody tr:hover {
+            background-color: #f5f5f5;
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .priority {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .priority.must {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .priority.should {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+
+        .priority.could {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+        }
+
+        .status.todo {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status.progress {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status.done {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status.blocked {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .summary-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .summary-card .number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border: 2px solid #dee2e6;
+        }
+
+        .toc h3 {
+            margin-top: 0;
+            border-bottom: none;
+        }
+
+        .toc ol {
+            margin-left: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .toc li {
+            margin: 0.8rem 0;
+            font-size: 1.1rem;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .usage-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .usage-section h4 {
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .usage-section p {
+            margin: 0.5rem 0;
+            line-height: 1.8;
+        }
+
+        .test-cases-table {
+            background: #fff9e6;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 1rem;
+            }
+            table {
+                font-size: 0.8rem;
+            }
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            table {
+                font-size: 0.85rem;
+            }
+            th, td {
+                padding: 0.6rem;
+            }
+        }
+
+        .legend {
+            background: #fff3cd;
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+            border: 2px solid #ffc107;
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Social Media App - User Stories & Acceptance Criteria</h1>
+
+        <div class="doc-info">
+            <p><strong>Project:</strong> Social Media Application</p>
+            <p><strong>Version:</strong> 1.0</p>
+            <p><strong>Date:</strong> February 26, 2026</p>
+            <p><strong>Format:</strong> User Story → Acceptance Criteria (Table Format)</p>
+        </div>
+
+        <!-- Summary Statistics -->
+        <h2>📊 Summary Statistics</h2>
+        <div class="summary-box">
+            <div class="summary-card">
+                <h4>Total User Stories</h4>
+                <div class="number">12</div>
+            </div>
+            <div class="summary-card">
+                <h4>Total Acceptance Criteria</h4>
+                <div class="number">143</div>
+            </div>
+            <div class="summary-card">
+                <h4>MUST Criteria</h4>
+                <div class="number">87</div>
+                <p>60.8%</p>
+            </div>
+            <div class="summary-card">
+                <h4>SHOULD Criteria</h4>
+                <div class="number">48</div>
+                <p>33.6%</p>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3 style="margin-top: 0; border: none;">🔖 Legend</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <span class="priority must">MUST</span>
+                    <span>Critical feature</span>
+                </div>
+                <div class="legend-item">
+                    <span class="priority should">SHOULD</span>
+                    <span>Important feature</span>
+                </div>
+                <div class="legend-item">
+                    <span class="priority could">COULD</span>
+                    <span>Nice to have</span>
+                </div>
+                <div class="legend-item">
+                    <span class="status todo">⏳ To Do</span>
+                    <span>Not started</span>
+                </div>
+                <div class="legend-item">
+                    <span class="status done">✅ Done</span>
+                    <span>Completed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3>📑 Table of Contents</h3>
+            <ol>
+                <li><a href="#user-registration">User Registration</a></li>
+                <li><a href="#user-login">User Login</a></li>
+                <li><a href="#create-post">Create Post</a></li>
+                <li><a href="#like-post">Like Post</a></li>
+                <li><a href="#comment-post">Comment on Post</a></li>
+                <li><a href="#follow-user">Follow User</a></li>
+                <li><a href="#news-feed">News Feed</a></li>
+                <li><a href="#user-profile">User Profile</a></li>
+                <li><a href="#search">Search</a></li>
+                <li><a href="#notifications">Notifications</a></li>
+                <li><a href="#direct-messaging">Direct Messaging</a></li>
+                <li><a href="#settings-privacy">Settings & Privacy</a></li>
+            </ol>
+        </div>
+
+        <!-- User Story 1: Registration -->
+        <h2 id="user-registration">1. User Registration</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> new visitor<br>
+            <strong>I want to</strong> register for an account<br>
+            <strong>So that</strong> I can access the social media platform and connect with others
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-1.1</td>
+                    <td>User can register using email and password</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.2</td>
+                    <td>User can register using Google OAuth</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.3</td>
+                    <td>User can register using Facebook OAuth</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.4</td>
+                    <td>Email must be unique in the system</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.5</td>
+                    <td>Password must be minimum 8 characters with 1 uppercase, 1 lowercase, 1 number</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.6</td>
+                    <td>Username must be unique and 3-20 characters</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.7</td>
+                    <td>User receives email verification link after registration</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.8</td>
+                    <td>User cannot access full features until email is verified</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.9</td>
+                    <td>Error messages display for invalid input</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-1.10</td>
+                    <td>Success message displays after successful registration</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-1.1</td>
+                    <td>Register with valid email and password</td>
+                    <td>Account created successfully</td>
+                </tr>
+                <tr>
+                    <td>TC-1.2</td>
+                    <td>Register with existing email</td>
+                    <td>Error: "Email already in use"</td>
+                </tr>
+                <tr>
+                    <td>TC-1.3</td>
+                    <td>Register with weak password</td>
+                    <td>Error: "Password does not meet requirements"</td>
+                </tr>
+                <tr>
+                    <td>TC-1.4</td>
+                    <td>Register with invalid email format</td>
+                    <td>Error: "Invalid email format"</td>
+                </tr>
+                <tr>
+                    <td>TC-1.5</td>
+                    <td>Register using Google OAuth</td>
+                    <td>Account created and logged in</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 2: Login -->
+        <h2 id="user-login">2. User Login</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> registered user<br>
+            <strong>I want to</strong> log in to my account<br>
+            <strong>So that</strong> I can access my profile and social features
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-2.1</td>
+                    <td>User can login with email and password</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.2</td>
+                    <td>User can login with username and password</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.3</td>
+                    <td>User can login using Google OAuth</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.4</td>
+                    <td>User can login using Facebook OAuth</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.5</td>
+                    <td>"Remember Me" checkbox keeps user logged in for 30 days</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.6</td>
+                    <td>"Forgot Password" link redirects to password reset</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.7</td>
+                    <td>User is redirected to home feed after successful login</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.8</td>
+                    <td>Error message displays for incorrect credentials</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.9</td>
+                    <td>Account is locked after 5 failed login attempts</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-2.10</td>
+                    <td>User session expires after 24 hours of inactivity</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-2.1</td>
+                    <td>Login with valid credentials</td>
+                    <td>Successfully logged in and redirected to feed</td>
+                </tr>
+                <tr>
+                    <td>TC-2.2</td>
+                    <td>Login with incorrect password</td>
+                    <td>Error: "Invalid credentials"</td>
+                </tr>
+                <tr>
+                    <td>TC-2.3</td>
+                    <td>Login with unverified email</td>
+                    <td>Error: "Please verify your email"</td>
+                </tr>
+                <tr>
+                    <td>TC-2.4</td>
+                    <td>Login with locked account</td>
+                    <td>Error: "Account locked. Try again in 15 minutes"</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 3: Create Post -->
+        <h2 id="create-post">3. Create Post</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> create and publish posts<br>
+            <strong>So that</strong> I can share content with my followers
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-3.1</td>
+                    <td>User can create text-only post (up to 5000 characters)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.2</td>
+                    <td>User can upload images (JPEG, PNG, GIF, max 10MB)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.3</td>
+                    <td>User can upload videos (MP4, MOV, max 500MB)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.4</td>
+                    <td>User can add up to 5 images per post</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.5</td>
+                    <td>User can add hashtags (e.g., #travel)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.6</td>
+                    <td>User can mention other users (e.g., @username)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.7</td>
+                    <td>User can add location/place tag</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.8</td>
+                    <td>User can set post privacy (Public, Friends, Only Me)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.9</td>
+                    <td>User can save post as draft</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.10</td>
+                    <td>User can schedule post for future date/time</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.11</td>
+                    <td>Post displays timestamp after publishing</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.12</td>
+                    <td>Real-time character counter displays for text</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-3.13</td>
+                    <td>User receives confirmation after successful post</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-3.1</td>
+                    <td>Create text-only post</td>
+                    <td>Post published and visible in feed</td>
+                </tr>
+                <tr>
+                    <td>TC-3.2</td>
+                    <td>Create post with image</td>
+                    <td>Image uploaded and displayed in post</td>
+                </tr>
+                <tr>
+                    <td>TC-3.3</td>
+                    <td>Create post exceeding character limit</td>
+                    <td>Error: "Post exceeds character limit"</td>
+                </tr>
+                <tr>
+                    <td>TC-3.4</td>
+                    <td>Create post with 6 images</td>
+                    <td>Error: "Maximum 5 images allowed"</td>
+                </tr>
+                <tr>
+                    <td>TC-3.5</td>
+                    <td>Create post with hashtags</td>
+                    <td>Hashtags are clickable and searchable</td>
+                </tr>
+                <tr>
+                    <td>TC-3.6</td>
+                    <td>Create post mentioning user</td>
+                    <td>Mentioned user receives notification</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 4: Like Post -->
+        <h2 id="like-post">4. Like Post</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> like posts<br>
+            <strong>So that</strong> I can show appreciation for content I enjoy
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-4.1</td>
+                    <td>User can like a post by clicking heart/like icon</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.2</td>
+                    <td>Like count increments immediately on client side</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.3</td>
+                    <td>Like is persisted to database</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.4</td>
+                    <td>User can unlike a post by clicking icon again</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.5</td>
+                    <td>Post author receives notification when post is liked</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.6</td>
+                    <td>User can view list of users who liked a post</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.7</td>
+                    <td>Liked posts display in user's "Liked Posts" section</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.8</td>
+                    <td>User cannot like the same post multiple times</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.9</td>
+                    <td>Like icon changes color/appearance when liked</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-4.10</td>
+                    <td>Like action is optimistic with rollback on error</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-4.1</td>
+                    <td>Like a post</td>
+                    <td>Like count increases, icon changes color</td>
+                </tr>
+                <tr>
+                    <td>TC-4.2</td>
+                    <td>Unlike a post</td>
+                    <td>Like count decreases, icon resets</td>
+                </tr>
+                <tr>
+                    <td>TC-4.3</td>
+                    <td>Like post when not logged in</td>
+                    <td>Redirect to login page</td>
+                </tr>
+                <tr>
+                    <td>TC-4.4</td>
+                    <td>Like post with network error</td>
+                    <td>UI reverts to unliked state</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 5: Comment on Post -->
+        <h2 id="comment-post">5. Comment on Post</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> comment on posts<br>
+            <strong>So that</strong> I can engage in conversations and share my thoughts
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-5.1</td>
+                    <td>User can add comment (up to 2000 characters)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.2</td>
+                    <td>Comment displays user's profile picture and name</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.3</td>
+                    <td>Comment displays timestamp (relative, e.g., "2 hours ago")</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.4</td>
+                    <td>Post author receives notification for new comment</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.5</td>
+                    <td>User can edit their own comments</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.6</td>
+                    <td>User can delete their own comments</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.7</td>
+                    <td>User can reply to comments (nested comments)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.8</td>
+                    <td>User can like comments</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.9</td>
+                    <td>User can mention other users in comments</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.10</td>
+                    <td>Comments are sorted by newest first (default)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.11</td>
+                    <td>User can sort comments by "Most Liked"</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.12</td>
+                    <td>Comment count displays on post</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-5.13</td>
+                    <td>"Load More" button shows older comments</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-5.1</td>
+                    <td>Add comment to post</td>
+                    <td>Comment appears immediately</td>
+                </tr>
+                <tr>
+                    <td>TC-5.2</td>
+                    <td>Add empty comment</td>
+                    <td>Error: "Comment cannot be empty"</td>
+                </tr>
+                <tr>
+                    <td>TC-5.3</td>
+                    <td>Edit own comment</td>
+                    <td>Comment updated successfully</td>
+                </tr>
+                <tr>
+                    <td>TC-5.4</td>
+                    <td>Delete own comment</td>
+                    <td>Comment removed from post</td>
+                </tr>
+                <tr>
+                    <td>TC-5.5</td>
+                    <td>Reply to comment</td>
+                    <td>Reply nested under parent comment</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 6: Follow User -->
+        <h2 id="follow-user">6. Follow User</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> follow other users<br>
+            <strong>So that</strong> I can see their posts in my news feed
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-6.1</td>
+                    <td>User can follow another user by clicking "Follow" button</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.2</td>
+                    <td>Follow button changes to "Following" after click</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.3</td>
+                    <td>User can unfollow by clicking "Following" button</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.4</td>
+                    <td>Followed user receives notification</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.5</td>
+                    <td>Followed user's posts appear in follower's feed</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.6</td>
+                    <td>Follower count updates in real-time</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.7</td>
+                    <td>Following count updates in real-time</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.8</td>
+                    <td>User can view list of followers</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.9</td>
+                    <td>User can view list of following</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.10</td>
+                    <td>User cannot follow themselves</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.11</td>
+                    <td>User can block/unblock users</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-6.12</td>
+                    <td>Blocked users cannot follow or see posts</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-6.1</td>
+                    <td>Follow a user</td>
+                    <td>Button changes to "Following", count increases</td>
+                </tr>
+                <tr>
+                    <td>TC-6.2</td>
+                    <td>Unfollow a user</td>
+                    <td>Button changes to "Follow", count decreases</td>
+                </tr>
+                <tr>
+                    <td>TC-6.3</td>
+                    <td>Attempt to follow self</td>
+                    <td>Error or button disabled</td>
+                </tr>
+                <tr>
+                    <td>TC-6.4</td>
+                    <td>Block a user</td>
+                    <td>User removed from followers, cannot follow</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 7: News Feed -->
+        <h2 id="news-feed">7. News Feed</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> view a personalized news feed<br>
+            <strong>So that</strong> I can see posts from people I follow and trending content
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-7.1</td>
+                    <td>Feed displays posts from followed users</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.2</td>
+                    <td>Feed displays user's own posts</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.3</td>
+                    <td>Posts are sorted by relevance (algorithm-based)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.4</td>
+                    <td>User can switch to "Latest" view (chronological)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.5</td>
+                    <td>Infinite scroll loads more posts automatically</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.6</td>
+                    <td>"Pull to refresh" updates feed with new posts</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.7</td>
+                    <td>Feed shows "Suggested Posts" from non-followed users</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.8</td>
+                    <td>User can hide/report inappropriate posts</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.9</td>
+                    <td>Feed displays loading skeleton while fetching</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.10</td>
+                    <td>Empty state message when no posts available</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-7.11</td>
+                    <td>Feed caches posts for offline viewing</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-7.1</td>
+                    <td>Load news feed</td>
+                    <td>Posts from followed users displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-7.2</td>
+                    <td>Scroll to bottom of feed</td>
+                    <td>More posts loaded automatically</td>
+                </tr>
+                <tr>
+                    <td>TC-7.3</td>
+                    <td>Pull to refresh</td>
+                    <td>New posts appear at top</td>
+                </tr>
+                <tr>
+                    <td>TC-7.4</td>
+                    <td>Switch to "Latest" view</td>
+                    <td>Posts sorted by time descending</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 8: User Profile -->
+        <h2 id="user-profile">8. User Profile</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> view and edit my profile<br>
+            <strong>So that</strong> I can manage my personal information and customize my presence
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-8.1</td>
+                    <td>Profile displays username, bio, location</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.2</td>
+                    <td>Profile displays profile picture</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.3</td>
+                    <td>Profile displays cover photo</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.4</td>
+                    <td>Profile displays follower count</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.5</td>
+                    <td>Profile displays following count</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.6</td>
+                    <td>Profile displays post count</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.7</td>
+                    <td>Profile displays grid of user's posts</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.8</td>
+                    <td>User can edit bio (up to 250 characters)</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.9</td>
+                    <td>User can upload new profile picture</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.10</td>
+                    <td>User can upload new cover photo</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.11</td>
+                    <td>User can add website URL</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.12</td>
+                    <td>User can set profile to private</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.13</td>
+                    <td>Profile displays "Edit Profile" button for own profile</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.14</td>
+                    <td>Profile displays "Follow" button for other profiles</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-8.15</td>
+                    <td>User can view other users' profiles</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-8.1</td>
+                    <td>View own profile</td>
+                    <td>All profile information displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-8.2</td>
+                    <td>Edit bio</td>
+                    <td>Bio updated successfully</td>
+                </tr>
+                <tr>
+                    <td>TC-8.3</td>
+                    <td>Upload profile picture</td>
+                    <td>Picture updated and cropped properly</td>
+                </tr>
+                <tr>
+                    <td>TC-8.4</td>
+                    <td>View other user's profile</td>
+                    <td>Public profile information displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-8.5</td>
+                    <td>View private profile (not following)</td>
+                    <td>Limited information shown</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 9: Search -->
+        <h2 id="search">9. Search</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> search for users, posts, and hashtags<br>
+            <strong>So that</strong> I can discover content and connect with people
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-9.1</td>
+                    <td>User can search by username</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.2</td>
+                    <td>User can search by hashtag</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.3</td>
+                    <td>User can search by post content</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.4</td>
+                    <td>Search displays results as user types (auto-suggest)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.5</td>
+                    <td>Search results categorized (Users, Posts, Hashtags)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.6</td>
+                    <td>Search history saved for quick access</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.7</td>
+                    <td>User can clear search history</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.8</td>
+                    <td>Trending hashtags displayed on search page</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.9</td>
+                    <td>Recent searches displayed before typing</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.10</td>
+                    <td>Empty state message when no results found</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-9.11</td>
+                    <td>Search is case-insensitive</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-9.1</td>
+                    <td>Search for username</td>
+                    <td>Matching users displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-9.2</td>
+                    <td>Search for hashtag</td>
+                    <td>Posts with hashtag displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-9.3</td>
+                    <td>Search with no results</td>
+                    <td>"No results found" message</td>
+                </tr>
+                <tr>
+                    <td>TC-9.4</td>
+                    <td>Search with typo</td>
+                    <td>Suggested corrections displayed</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 10: Notifications -->
+        <h2 id="notifications">10. Notifications</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> receive notifications for interactions<br>
+            <strong>So that</strong> I stay informed about activity on my posts and profile
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-10.1</td>
+                    <td>User receives notification when someone likes their post</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.2</td>
+                    <td>User receives notification when someone comments on their post</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.3</td>
+                    <td>User receives notification when someone follows them</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.4</td>
+                    <td>User receives notification when mentioned in post</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.5</td>
+                    <td>User receives notification when mentioned in comment</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.6</td>
+                    <td>Notification badge displays unread count</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.7</td>
+                    <td>Notifications marked as read when clicked</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.8</td>
+                    <td>User can mark all notifications as read</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.9</td>
+                    <td>User can enable/disable notification types</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.10</td>
+                    <td>Push notifications sent to mobile devices</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.11</td>
+                    <td>Email notifications sent for important events</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.12</td>
+                    <td>Notifications grouped by type</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-10.13</td>
+                    <td>Notifications display timestamp</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-10.1</td>
+                    <td>Receive like notification</td>
+                    <td>Badge updates, notification appears in list</td>
+                </tr>
+                <tr>
+                    <td>TC-10.2</td>
+                    <td>Click on notification</td>
+                    <td>Marked as read, navigates to related post</td>
+                </tr>
+                <tr>
+                    <td>TC-10.3</td>
+                    <td>Disable comment notifications</td>
+                    <td>No notifications for comments received</td>
+                </tr>
+                <tr>
+                    <td>TC-10.4</td>
+                    <td>Mark all as read</td>
+                    <td>All notifications marked read, badge clears</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 11: Direct Messaging -->
+        <h2 id="direct-messaging">11. Direct Messaging</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> send private messages to other users<br>
+            <strong>So that</strong> I can have one-on-one conversations
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-11.1</td>
+                    <td>User can send text message to another user</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.2</td>
+                    <td>User can send images in messages</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.3</td>
+                    <td>User can send emojis in messages</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.4</td>
+                    <td>Messages display in chronological order</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.5</td>
+                    <td>Unread message badge displays on message icon</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.6</td>
+                    <td>User receives real-time messages (WebSocket)</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.7</td>
+                    <td>"Typing..." indicator when other user is typing</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.8</td>
+                    <td>User can delete messages for themselves</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.9</td>
+                    <td>User can delete conversation</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.10</td>
+                    <td>Message list displays recent conversations</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.11</td>
+                    <td>User can search conversations</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.12</td>
+                    <td>"Seen" indicator when message is read</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-11.13</td>
+                    <td>User can block users from messaging</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-11.1</td>
+                    <td>Send message to user</td>
+                    <td>Message delivered and displayed</td>
+                </tr>
+                <tr>
+                    <td>TC-11.2</td>
+                    <td>Receive message</td>
+                    <td>Real-time notification appears</td>
+                </tr>
+                <tr>
+                    <td>TC-11.3</td>
+                    <td>Delete conversation</td>
+                    <td>All messages removed from list</td>
+                </tr>
+                <tr>
+                    <td>TC-11.4</td>
+                    <td>Block user</td>
+                    <td>User cannot send messages</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- User Story 12: Settings & Privacy -->
+        <h2 id="settings-privacy">12. Settings & Privacy</h2>
+        
+        <h3>User Story</h3>
+        <div class="user-story">
+            <strong>As a</strong> logged-in user<br>
+            <strong>I want to</strong> manage my account settings and privacy<br>
+            <strong>So that</strong> I can control my experience and data
+        </div>
+
+        <h3>Acceptance Criteria</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Criterion</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AC-12.1</td>
+                    <td>User can change password</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.2</td>
+                    <td>User can change email address</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.3</td>
+                    <td>User can enable two-factor authentication</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.4</td>
+                    <td>User can set account to private</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.5</td>
+                    <td>User can control who can comment on posts</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.6</td>
+                    <td>User can control who can tag them</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.7</td>
+                    <td>User can control who can message them</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.8</td>
+                    <td>User can mute/unmute notifications</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.9</td>
+                    <td>User can download their data</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.10</td>
+                    <td>User can deactivate account</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.11</td>
+                    <td>User can delete account permanently</td>
+                    <td><span class="priority must">MUST</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.12</td>
+                    <td>User can view blocked users list</td>
+                    <td><span class="priority should">SHOULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+                <tr>
+                    <td>AC-12.13</td>
+                    <td>User can manage connected apps</td>
+                    <td><span class="priority could">COULD</span></td>
+                    <td><span class="status todo">⏳ To Do</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Test Cases</h3>
+        <table class="test-cases-table">
+            <thead>
+                <tr>
+                    <th>Test ID</th>
+                    <th>Description</th>
+                    <th>Expected Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TC-12.1</td>
+                    <td>Change password</td>
+                    <td>Password updated, requires re-login</td>
+                </tr>
+                <tr>
+                    <td>TC-12.2</td>
+                    <td>Enable 2FA</td>
+                    <td>SMS/App code required on next login</td>
+                </tr>
+                <tr>
+                    <td>TC-12.3</td>
+                    <td>Set account to private</td>
+                    <td>Only followers can see posts</td>
+                </tr>
+                <tr>
+                    <td>TC-12.4</td>
+                    <td>Deactivate account</td>
+                    <td>Account hidden, can be reactivated</td>
+                </tr>
+                <tr>
+                    <td>TC-12.5</td>
+                    <td>Delete account</td>
+                    <td>Account permanently removed after 30 days</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- How to Use This Document -->
+        <h2>📖 How to Use This Document</h2>
+
+        <div class="usage-section">
+            <h4>For Product Managers:</h4>
+            <p>✓ Use user stories for backlog planning and sprint prioritization</p>
+            <p>✓ Track completion status via the Status column in each table</p>
+            <p>✓ Focus on MUST criteria first (60.8% of total requirements)</p>
+            <p>✓ Use priority breakdown to allocate resources effectively</p>
+        </div>
+
+        <div class="usage-section">
+            <h4>For Developers:</h4>
+            <p>✓ Each acceptance criterion is a testable requirement</p>
+            <p>✓ Use test cases as a guide for unit and integration tests</p>
+            <p>✓ Reference AC IDs in pull requests and commit messages</p>
+            <p>✓ Implement features based on priority (MUST → SHOULD → COULD)</p>
+        </div>
+
+        <div class="usage-section">
+            <h4>For QA Engineers:</h4>
+            <p>✓ Test cases are derived directly from acceptance criteria</p>
+            <p>✓ Every AC should have at least one corresponding test case</p>
+            <p>✓ Use for regression testing after each sprint</p>
+            <p>✓ Track defects against specific AC IDs for traceability</p>
+        </div>
+
+        <div class="usage-section">
+            <h4>For Stakeholders:</h4>
+            <p>✓ Clear understanding of feature scope and requirements</p>
+            <p>✓ Progress tracking via status indicators</p>
+            <p>✓ Easy validation of deliverables against acceptance criteria</p>
+            <p>✓ Visual priority system helps understand what comes first</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="margin-top: 4rem; padding-top: 2rem; border-top: 2px solid #e0e0e0; text-align: center; color: #666;">
+            <p><strong>Document Prepared By:</strong> Product Engineering Team</p>
+            <p><strong>Last Updated:</strong> February 26, 2026</p>
+            <p><strong>Version:</strong> 1.0</p>
+        </div>
+    </div>
+</body>
+</html>
