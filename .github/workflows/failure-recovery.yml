@@ -1,0 +1,273 @@
+name: CI Failure Recovery Agent
+
+on:
+  workflow_run:
+    workflows: ["Optimized CI/CD Pipeline"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  analyze-failure:
+    # Only run if the workflow failed
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests PyYAML
+      
+      - name: Download workflow logs
+        id: download-logs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Get workflow run details
+            const runId = context.payload.workflow_run.id;
+            
+            try {
+              // Get jobs for the workflow run
+              const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId
+              });
+              
+              let failedJobs = [];
+              let allLogs = '';
+              
+              // Find failed jobs
+              for (const job of jobs.jobs) {
+                if (job.conclusion === 'failure') {
+                  failedJobs.push({
+                    name: job.name,
+                    id: job.id
+                  });
+                  
+                  // Download logs for failed job
+                  try {
+                    const logs = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      job_id: job.id
+                    });
+                    
+                    allLogs += `\n\n=== JOB: ${job.name} ===\n\n`;
+                    allLogs += logs.data;
+                  } catch (e) {
+                    console.log(`Could not download logs for job ${job.name}`);
+                  }
+                }
+              }
+              
+              // Save logs to file
+              fs.writeFileSync('failure_logs.txt', allLogs);
+              
+              // Set outputs
+              core.setOutput('failed_jobs', JSON.stringify(failedJobs));
+              core.setOutput('failed_count', failedJobs.length);
+              
+              return failedJobs.length > 0;
+              
+            } catch (error) {
+              console.error('Error downloading logs:', error);
+              return false;
+            }
+      
+      - name: Check if retry needed
+        id: check-retry
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.payload.workflow_run.id;
+            
+            // Get workflow run attempt number
+            const { data: run } = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId
+            });
+            
+            const attemptNumber = run.run_attempt || 1;
+            const shouldRetry = attemptNumber < 2; // Retry only once
+            
+            console.log(`Current attempt: ${attemptNumber}`);
+            console.log(`Should retry: ${shouldRetry}`);
+            
+            core.setOutput('should_retry', shouldRetry);
+            core.setOutput('attempt_number', attemptNumber);
+            
+            return shouldRetry;
+      
+      - name: Run failure analysis agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.event.workflow_run.id }}
+          GITHUB_WORKFLOW: ${{ github.event.workflow_run.name }}
+          JOB_NAME: ${{ fromJson(steps.download-logs.outputs.failed_jobs)[0].name || 'unknown' }}
+          FAILURE_LOGS_FILE: failure_logs.txt
+          PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number || '' }}
+          AUTO_FIX: 'true'
+          RETRY_ENABLED: ${{ steps.check-retry.outputs.should_retry }}
+          GITHUB_REF_NAME: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          python ci_failure_agent.py
+      
+      - name: Upload analysis report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ci-failure-report
+          path: ci_failure_report.txt
+          retention-days: 30
+      
+      - name: Configure git
+        if: steps.check-retry.outputs.should_retry == 'true'
+        run: |
+          git config --global user.name "CI Failure Agent"
+          git config --global user.email "ci-agent@github-actions.bot"
+      
+      - name: Retry workflow (first failure only)
+        if: steps.check-retry.outputs.should_retry == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.payload.workflow_run.id;
+            
+            console.log(`Retrying workflow run ${runId}...`);
+            
+            try {
+              await github.rest.actions.reRunWorkflowFailedJobs({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: runId
+              });
+              
+              console.log('✓ Retry triggered successfully');
+            } catch (error) {
+              console.error('✗ Failed to trigger retry:', error);
+            }
+      
+      - name: Post failure summary (after retry)
+        if: steps.check-retry.outputs.should_retry == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const prNumber = context.payload.workflow_run.pull_requests[0]?.number;
+            
+            if (!prNumber) {
+              console.log('No PR associated with this run');
+              return;
+            }
+            
+            // Read analysis report
+            let report = 'Analysis report not generated';
+            try {
+              report = fs.readFileSync('ci_failure_report.txt', 'utf8');
+            } catch (e) {
+              console.log('Could not read report file');
+            }
+            
+            const comment = `## ⚠️ CI Pipeline Failed After Retry
+
+The pipeline has failed **twice** and requires manual intervention.
+
+### 📊 Failure Summary
+
+${report.substring(0, 2000)}
+
+### 🔍 Full Analysis
+
+The complete failure analysis has been uploaded as an artifact.
+[View workflow run](${context.payload.workflow_run.html_url})
+
+### 🛠️ Recommended Actions
+
+1. **Review the analysis** above for specific issues
+2. **Apply suggested fixes** in your local environment
+3. **Test fixes locally** before pushing
+4. **Push changes** to re-trigger the pipeline
+
+The CI Failure Agent has attempted automatic fixes where possible.
+
+---
+*Failed after attempt ${steps.check-retry.outputs.attempt_number}* | *Agent: v1.0*
+`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: comment
+            });
+            
+            console.log(`Posted failure summary to PR #${prNumber}`);
+      
+      - name: Send Slack notification
+        if: steps.check-retry.outputs.should_retry == 'false' && vars.SLACK_WEBHOOK
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: ':rotating_light: CI Pipeline Failed After Retry',
+              attachments: [{
+                color: 'danger',
+                fields: [
+                  {
+                    title: 'Repository',
+                    value: '${{ github.repository }}',
+                    short: true
+                  },
+                  {
+                    title: 'Branch',
+                    value: '${{ github.event.workflow_run.head_branch }}',
+                    short: true
+                  },
+                  {
+                    title: 'Workflow',
+                    value: '${{ github.event.workflow_run.name }}',
+                    short: true
+                  },
+                  {
+                    title: 'Attempts',
+                    value: '${{ steps.check-retry.outputs.attempt_number }}',
+                    short: true
+                  },
+                  {
+                    title: 'Failed Jobs',
+                    value: '${{ steps.download-logs.outputs.failed_count }}',
+                    short: false
+                  }
+                ],
+                actions: [{
+                  type: 'button',
+                  text: 'View Workflow Run',
+                  url: '${{ github.event.workflow_run.html_url }}'
+                }]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
