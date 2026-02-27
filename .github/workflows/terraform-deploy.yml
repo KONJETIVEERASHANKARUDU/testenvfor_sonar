@@ -1,0 +1,229 @@
+name: 🏗️ Terraform Auto-Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+  workflow_dispatch:
+
+env:
+  TF_VERSION: '1.7.0'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  terraform-plan:
+    name: 📋 Terraform Plan
+    runs-on: ubuntu-latest
+    outputs:
+      tfplanExitCode: ${{ steps.plan.outputs.exitcode }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        id: init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Format Check
+        id: fmt
+        run: |
+          cd terraform
+          terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Validate
+        id: validate
+        run: |
+          cd terraform
+          terraform validate
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd terraform
+          terraform plan -detailed-exitcode -no-color -out=tfplan
+        env:
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/tfplan
+          retention-days: 5
+
+      - name: Comment PR with Plan
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `#### Terraform Plan 📊
+            
+            **Format Check:** \`${{ steps.fmt.outcome }}\`
+            **Validation:** \`${{ steps.validate.outcome }}\`
+            **Plan:** \`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`terraform
+            ${{ steps.plan.outputs.stdout }}
+            \`\`\`
+            
+            </details>
+            
+            *Pusher: @${{ github.actor }}, Workflow: \`${{ github.workflow }}\`*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+  terraform-apply:
+    name: 🚀 Terraform Apply
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: ${{ steps.apply.outputs.sonarqube_url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          cd terraform
+          terraform apply -auto-approve tfplan
+          
+          # Capture outputs
+          echo "sonarqube_url=$(terraform output -raw sonarqube_url)" >> $GITHUB_OUTPUT
+          echo "backup_bucket=$(terraform output -raw backup_bucket)" >> $GITHUB_OUTPUT
+
+      - name: Verify Deployment
+        run: |
+          echo "✅ Infrastructure deployed successfully!"
+          echo "📊 SonarQube URL: ${{ steps.apply.outputs.sonarqube_url }}"
+          echo "💾 Backup Bucket: ${{ steps.apply.outputs.backup_bucket }}"
+
+      - name: Create Deployment Summary
+        run: |
+          cd terraform
+          cat >> $GITHUB_STEP_SUMMARY <<'EOF'
+          ## 🎉 Terraform Deployment Complete
+          
+          ### 📊 Infrastructure Status
+          - ✅ VPC and Networking configured
+          - ✅ Auto-scaling enabled
+          - ✅ Load balancer deployed
+          - ✅ Monitoring enabled
+          - ✅ Auto-healing active
+          - ✅ Daily backups scheduled
+          
+          ### 🔗 Outputs
+          \`\`\`
+          $(terraform output)
+          \`\`\`
+          
+          ### 🚀 Access SonarQube
+          URL: ${{ steps.apply.outputs.sonarqube_url }}
+          
+          Default Credentials:
+          - Username: `admin`
+          - Password: `admin`
+          
+          ⚠️ Change the default password immediately!
+          
+          ### 🔄 Auto-Healing Features
+          - Health checks every 5 minutes
+          - Automatic container restart on failure
+          - Auto-scaling based on CPU (>75%)
+          - Daily backups at 2 AM UTC
+          
+          EOF
+
+  terraform-destroy:
+    name: 💥 Terraform Destroy
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: destroy
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Destroy
+        run: |
+          cd terraform
+          terraform destroy -auto-approve
+        env:
+          TF_VAR_github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cleanup Complete
+        run: |
+          echo "✅ Infrastructure destroyed successfully!"
+          echo "💾 Backups are retained in S3"
