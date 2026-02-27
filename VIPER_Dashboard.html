@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIPER - Vertex Intelligent Pipeline for Enterprise Releases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0052CC;
+            --secondary: #0065FF;
+            --success: #00875A;
+            --warning: #FF991F;
+            --danger: #DE350B;
+            --text-primary: #172B4D;
+            --text-secondary: #5E6C84;
+            --bg-light: #F4F5F7;
+            --border: #DFE1E6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-tab {
+            padding: 0.7rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1600px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--success);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .stat-card.danger {
+            border-left-color: var(--danger);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-sublabel {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Pipeline Grid */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pipeline-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .pipeline-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .pipeline-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .pipeline-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .pipeline-repo {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .pipeline-body {
+            padding: 1.5rem;
+        }
+
+        .pipeline-stage {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-light);
+            border-radius: 5px;
+        }
+
+        .stage-icon {
+            font-size: 1.5rem;
+        }
+
+        .stage-info {
+            flex: 1;
+        }
+
+        .stage-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stage-status {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.success {
+            background: #E3FCEF;
+            color: #006644;
+        }
+
+        .status-badge.running {
+            background: #DEEBFF;
+            color: #0747A6;
+        }
+
+        .status-badge.failed {
+            background: #FFEBE6;
+            color: #BF2600;
+        }
+
+        .status-badge.pending {
+            background: #FFF0B3;
+            color: #FF8B00;
+        }
+
+        /* Language Support Matrix */
+        .support-matrix {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .matrix-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .matrix-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .matrix-table th {
+            background: var(--bg-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .matrix-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .matrix-table tr:hover {
+            background: var(--bg-light);
+        }
+
+        .support-icon {
+            font-size: 1.2rem;
+        }
+
+        .support-icon.yes {
+            color: var(--success);
+        }
+
+        .support-icon.partial {
+            color: var(--warning);
+        }
+
+        .support-icon.no {
+            color: var(--text-secondary);
+        }
+
+        /* Onboarding Progress */
+        .onboarding-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .onboarding-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .onboarding-item:last-child {
+            border-bottom: none;
+        }
+
+        .onboarding-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .onboarding-details {
+            flex: 1;
+        }
+
+        .onboarding-team {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .onboarding-repo {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .onboarding-progress {
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .onboarding-stage {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Service Catalog */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .service-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .service-languages {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .language-tag {
+            padding: 0.25rem 0.75rem;
+            background: var(--bg-light);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Deployment Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -2.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+        }
+
+        .timeline-dot.success {
+            border-color: var(--success);
+        }
+
+        .timeline-dot.running {
+            border-color: var(--warning);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .timeline-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .timeline-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-btn {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102,126,234,0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🐍</div>
+                <div class="logo-text">
+                    <h1>VIPER</h1>
+                    <p>Vertex Intelligent Pipeline for Enterprise Releases</p>
+                </div>
+            </div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+                <button class="nav-tab" onclick="switchTab('pipelines')">Pipelines</button>
+                <button class="nav-tab" onclick="switchTab('onboarding')">Onboarding</button>
+                <button class="nav-tab" onclick="switchTab('services')">Services</button>
+                <button class="nav-tab" onclick="switchTab('matrix')">Support Matrix</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Overview Tab -->
+        <div class="tab-content active" id="overview">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card success">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-label">Active Repositories</div>
+                    <div class="stat-value">127</div>
+                    <div class="stat-sublabel">+12 this month</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-label">Deployments Today</div>
+                    <div class="stat-value">43</div>
+                    <div class="stat-sublabel">15 to production</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-icon">⚙️</div>
+                    <div class="stat-label">Pipelines Running</div>
+                    <div class="stat-value">8</div>
+                    <div class="stat-sublabel">Avg: 4.2 min</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value">94%</div>
+                    <div class="stat-sublabel">Last 7 days</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔒</div>
+                    <div class="stat-label">Security Scans</div>
+                    <div class="stat-value">381</div>
+                    <div class="stat-sublabel">Today</div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-label">Critical Vulnerabilities</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-sublabel">Requires attention</div>
+                </div>
+            </div>
+
+            <!-- Deployment Timeline -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1.5rem; color: var(--text-primary);">🕐 Recent Deployment Activity</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">Production Deployment: user-service v2.4.1</div>
+                                <span class="status-badge success">Success</span>
+                            </div>
+                            <div class="timeline-time">5 minutes ago • us-east-2</div>
+                            <div class="timeline-description">Deployed to production with 0 critical vulnerabilities</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot running"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">Stage Deployment: payment-api v1.8.0</div>
+                                <span class="status-badge running">Running</span>
+                            </div>
+                            <div class="timeline-time">12 minutes ago • us-west-2, eu-central-1</div>
+                            <div class="timeline-description">Multi-region rollout in progress...</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">QA Promotion: order-service v3.1.2</div>
+                                <span class="status-badge success">Success</span>
+                            </div>
+                            <div class="timeline-time">28 minutes ago • dev → qa</div>
+                            <div class="timeline-description">Promoted from dev after passing all integration tests</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">Dev Deployment: notification-service v1.0.5</div>
+                                <span class="status-badge success">Success</span>
+                            </div>
+                            <div class="timeline-time">1 hour ago • cne-use2-dev01-blue</div>
+                            <div class="timeline-description">Initial VIPER deployment completed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipelines Tab -->
+        <div class="tab-content" id="pipelines">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search repositories, teams, or services...">
+                <button class="search-btn">🔍 Search</button>
+            </div>
+
+            <div class="pipeline-grid">
+                <div class="pipeline-card">
+                    <div class="pipeline-header">
+                        <div class="pipeline-title">user-service</div>
+                        <div class="pipeline-repo">vertexinc/user-service</div>
+                    </div>
+                    <div class="pipeline-body">
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">PR Scan</div>
+                                <div class="stage-status">Snyk SAST | SonarQube | Super-linter</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Build & Scan</div>
+                                <div class="stage-status">Container: v2.4.1 | 0 critical</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">🚀</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Dev</div>
+                                <div class="stage-status">cne-use2-dev01-blue</div>
+                            </div>
+                            <span class="status-badge success">Deployed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">🚀</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Production</div>
+                                <div class="stage-status">us-east-2, us-west-2</div>
+                            </div>
+                            <span class="status-badge success">Live</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-card">
+                    <div class="pipeline-header">
+                        <div class="pipeline-title">payment-api</div>
+                        <div class="pipeline-repo">vertexinc/payment-api</div>
+                    </div>
+                    <div class="pipeline-body">
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">PR Scan</div>
+                                <div class="stage-status">Snyk SAST | SonarQube</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Build & Scan</div>
+                                <div class="stage-status">Container: v1.8.0 | 1 high</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">🚀</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Stage</div>
+                                <div class="stage-status">Multi-region rollout</div>
+                            </div>
+                            <span class="status-badge running">Running</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">⏳</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Production</div>
+                                <div class="stage-status">Awaiting approval</div>
+                            </div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-card">
+                    <div class="pipeline-header">
+                        <div class="pipeline-title">order-service</div>
+                        <div class="pipeline-repo">vertexinc/order-service</div>
+                    </div>
+                    <div class="pipeline-body">
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">PR Scan</div>
+                                <div class="stage-status">Snyk SAST | SonarQube</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Build & Scan</div>
+                                <div class="stage-status">Container: v3.1.2 | 0 critical</div>
+                            </div>
+                            <span class="status-badge success">Passed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">🚀</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy QA</div>
+                                <div class="stage-status">Promoted from dev</div>
+                            </div>
+                            <span class="status-badge success">Deployed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">⏳</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Stage</div>
+                                <div class="stage-status">Awaiting QA approval</div>
+                            </div>
+                            <span class="status-badge pending">Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipeline-card">
+                    <div class="pipeline-header">
+                        <div class="pipeline-title">notification-service</div>
+                        <div class="pipeline-repo">vertexinc/notification-service</div>
+                    </div>
+                    <div class="pipeline-body">
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">❌</div>
+                            <div class="stage-info">
+                                <div class="stage-name">PR Scan</div>
+                                <div class="stage-status">SonarQube quality gate failed</div>
+                            </div>
+                            <span class="status-badge failed">Failed</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">⏸️</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Build & Scan</div>
+                                <div class="stage-status">Blocked by PR scan</div>
+                            </div>
+                            <span class="status-badge">Blocked</span>
+                        </div>
+
+                        <div class="pipeline-stage">
+                            <div class="stage-icon">⏸️</div>
+                            <div class="stage-info">
+                                <div class="stage-name">Deploy Dev</div>
+                                <div class="stage-status">Not started</div>
+                            </div>
+                            <span class="status-badge">Blocked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Tab -->
+        <div class="tab-content" id="onboarding">
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 1rem;">🚀 Active Onboarding Efforts</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Teams currently onboarding to VIPER platform</p>
+
+                <div class="onboarding-list">
+                    <div class="onboarding-item">
+                        <div class="onboarding-avatar">IPS</div>
+                        <div class="onboarding-details">
+                            <div class="onboarding-team">IPS Team - Invoice Processing Service</div>
+                            <div class="onboarding-repo">vertexinc/invoice-processing-service</div>
+                            <div class="onboarding-progress">
+                                <div class="onboarding-stage">
+                                    ✅ Config Created | ✅ PR Scans Active | 🔄 Deployment Setup | ⏳ Production Review
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge running">75% Complete</span>
+                    </div>
+
+                    <div class="onboarding-item">
+                        <div class="onboarding-avatar">VCP</div>
+                        <div class="onboarding-details">
+                            <div class="onboarding-team">VCP - Vertex Cloud Platform</div>
+                            <div class="onboarding-repo">vertexinc/vcp-api-gateway</div>
+                            <div class="onboarding-progress">
+                                <div class="onboarding-stage">
+                                    ✅ Config Created | ✅ PR Scans Active | ✅ Deployment Setup | 🔄 Testing
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 90%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge success">90% Complete</span>
+                    </div>
+
+                    <div class="onboarding-item">
+                        <div class="onboarding-avatar">OSC</div>
+                        <div class="onboarding-details">
+                            <div class="onboarding-team">OSC - Order & Sign Capture</div>
+                            <div class="onboarding-repo">vertexinc/osc-migration</div>
+                            <div class="onboarding-progress">
+                                <div class="onboarding-stage">
+                                    ✅ Config Created | 🔄 PR Scans Setup | ⏳ Snyk Config | ⏳ Deployment
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge pending">40% Complete</span>
+                    </div>
+
+                    <div class="onboarding-item">
+                        <div class="onboarding-avatar">E-I</div>
+                        <div class="onboarding-details">
+                            <div class="onboarding-team">E-Invoicing - .NET Migration</div>
+                            <div class="onboarding-repo">vertexinc/e-invoicing-viper-integration-poc</div>
+                            <div class="onboarding-progress">
+                                <div class="onboarding-stage">
+                                    🔄 Config Creation | ⏳ Dockerfile | ⏳ PR Scans | ⏳ Deployment
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 25%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="status-badge pending">25% Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onboarding Checklist -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <h2 style="margin-bottom: 1rem;">📋 Onboarding Checklist</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Required steps for VIPER adoption</p>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">1. Application Intake Meeting</div>
+                            <div class="timeline-description">Sync with team to review requirements, collect app repo link, verify containerization</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">2. Snyk Setup</div>
+                            <div class="timeline-description">Identify organization, create service account API key, add to GitHub secrets</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">3. Configuration Files</div>
+                            <div class="timeline-description">Create viper_config.yaml, Dockerfile, GitHub Actions workflow</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">4. Deployment Target Setup</div>
+                            <div class="timeline-description">ArgoCD project setup (via CNE), 1Password integration (if needed)</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">5. Testing & Validation</div>
+                            <div class="timeline-description">Unit tests, integration tests (VITAL), contract tests (optional)</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">6. Production Readiness Review (PRR)</div>
+                            <div class="timeline-description">Operational readiness discussions, security review, CNE approval</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Tab -->
+        <div class="tab-content" id="services">
+            <h2 style="margin-bottom: 1.5rem; color: var(--text-primary);">📦 VIPER Service Catalogue</h2>
+
+            <div class="service-grid">
+                <div class="service-card">
+                    <div class="service-icon">🔍</div>
+                    <div class="service-title">Snyk SAST</div>
+                    <div class="service-description">Static application security testing to identify vulnerabilities like injection flaws, XSS, and buffer overflows in source code.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">Java</span>
+                        <span class="language-tag">.NET</span>
+                        <span class="language-tag">Python</span>
+                        <span class="language-tag">Node.js</span>
+                        <span class="language-tag">Go</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📊</div>
+                    <div class="service-title">SonarQube</div>
+                    <div class="service-description">Code quality analysis detecting bugs, security vulnerabilities, code smells, and test coverage gaps.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">Java</span>
+                        <span class="language-tag">Python</span>
+                        <span class="language-tag">Node.js</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">✨</div>
+                    <div class="service-title">Super-linter</div>
+                    <div class="service-description">Comprehensive linting for multiple languages to enforce coding standards and detect syntax errors.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">Java</span>
+                        <span class="language-tag">Go</span>
+                        <span class="language-tag">Python</span>
+                        <span class="language-tag">Node.js</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📦</div>
+                    <div class="service-title">Snyk SCA</div>
+                    <div class="service-description">Software composition analysis scanning build files for vulnerabilities in open-source dependencies.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">Java</span>
+                        <span class="language-tag">.NET</span>
+                        <span class="language-tag">Python</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🐳</div>
+                    <div class="service-title">Container Scanning</div>
+                    <div class="service-description">Automated security scanning of Docker images for OS package and application dependency vulnerabilities.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🚀</div>
+                    <div class="service-title">Helm Chart Generation</div>
+                    <div class="service-description">Automated creation and packaging of Helm charts for Kubernetes deployments with standardized templates.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🔄</div>
+                    <div class="service-title">Migration Images</div>
+                    <div class="service-description">Automated building and deployment of database migration images as Kubernetes jobs before application deployment.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">📈</div>
+                    <div class="service-title">Datadog Integration</div>
+                    <div class="service-description">Automated setup of monitoring dashboards, alerts, and synthetic tests for observability.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🧪</div>
+                    <div class="service-title">Unit Testing</div>
+                    <div class="service-description">Automated execution and reporting of unit tests with customizable commands and frameworks.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🤝</div>
+                    <div class="service-title">Contract Testing</div>
+                    <div class="service-description">Pact-based API contract validation ensuring service compatibility and preventing breaking changes.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🔗</div>
+                    <div class="service-title">Integration Testing</div>
+                    <div class="service-description">Automated testing of deployed microservices in Kubernetes environments via containerized test jobs.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">🎯</div>
+                    <div class="service-title">Policy Enforcement</div>
+                    <div class="service-description">Automated compliance checks ensuring code changes adhere to organizational policies before merging.</div>
+                    <div class="service-languages">
+                        <span class="language-tag">All Languages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support Matrix Tab -->
+        <div class="tab-content" id="matrix">
+            <div class="support-matrix">
+                <div class="matrix-header">
+                    <h2>Language & Feature Support Matrix</h2>
+                    <p>Comprehensive overview of VIPER capabilities across different programming languages</p>
+                </div>
+
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th>Language</th>
+                            <th>PR Scan Ruleset</th>
+                            <th>Snyk SAST</th>
+                            <th>SonarQube</th>
+                            <th>Super-linter</th>
+                            <th>Snyk SCA</th>
+                            <th>Container Scan</th>
+                            <th>Helm Charts</th>
+                            <th>K8s Deploy</th>
+                            <th>Unit Tests</th>
+                            <th>Integration Tests</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Java/Maven</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Java/Gradle</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">.NET</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Go</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Python</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Node.js</td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; font-weight: 600;">Terraform</td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon yes">✅</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon no">❌</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                            <td><span class="support-icon partial">⚠️</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div style="padding: 2rem; background: var(--bg-light);">
+                    <h3 style="margin-bottom: 1rem;">Legend</h3>
+                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                        <div><span class="support-icon yes">✅</span> Fully Supported</div>
+                        <div><span class="support-icon partial">⚠️</span> Partial Support / In Progress</div>
+                        <div><span class="support-icon no">❌</span> Not Supported</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roadmap Section -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 2rem;">
+                <h2 style="margin-bottom: 1rem;">🗓️ VIPER Roadmap</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Planned features and enhancements</p>
+
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">✅ MVP Delivered (Q4 2024)</div>
+                            </div>
+                            <div class="timeline-description">
+                                CI workflows, security scanning, container builds, Kubernetes deployments, multi-language support
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot success"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">✅ v4.5.0 Released (Current)</div>
+                            </div>
+                            <div class="timeline-description">
+                                .NET, Go, Python support • PR Scanning • Observability • SonarQube • Promotion pipelines
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot running"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">🔄 Project Venom (In Progress)</div>
+                            </div>
+                            <div class="timeline-description">
+                                NEST: Self-service onboarding UI • COBRA: Repository visibility dashboard • Automated onboarding workflows
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <div class="timeline-title">📅 2025 Roadmap</div>
+                            </div>
+                            <div class="timeline-description">
+                                IaC scanning (Terraform) • Enhanced metrics & reporting • Automated rollback • Blue/Green deployments • Multi-cloud support
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            const runningBadges = document.querySelectorAll('.status-badge.running');
+            runningBadges.forEach(badge => {
+                badge.style.opacity = badge.style.opacity === '0.5' ? '1' : '0.5';
+            });
+        }, 1000);
+
+        // Auto-refresh metrics (simulated)
+        function updateMetrics() {
+            const deploymentValue = document.querySelector('.stat-value');
+            if (deploymentValue && deploymentValue.textContent === '43') {
+                const currentValue = parseInt(deploymentValue.textContent);
+                deploymentValue.textContent = currentValue + Math.floor(Math.random() * 3);
+            }
+        }
+
+        setInterval(updateMetrics, 30000); // Update every 30 seconds
+    </script>
+</body>
+</html>

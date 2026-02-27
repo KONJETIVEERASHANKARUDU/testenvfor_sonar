@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonarQube Upgrade Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px 40px;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .version-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .version-panel.current {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 3px solid #4caf50;
+        }
+        
+        .version-panel.upgrade {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 3px solid #2196F3;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+        
+        .panel-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin-right: 15px;
+        }
+        
+        .current .panel-icon {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .upgrade .panel-icon {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .panel-title {
+            flex: 1;
+        }
+        
+        .panel-title h2 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        
+        .panel-title p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .version-display {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .version-number-large {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .version-build {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+        
+        .version-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-item strong {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .info-item span {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1em;
+        }
+        
+        .dropdown-container {
+            margin-bottom: 20px;
+        }
+        
+        .dropdown-container label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        
+        .version-select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #2196F3;
+            border-radius: 8px;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .version-select:hover {
+            border-color: #1976D2;
+            box-shadow: 0 3px 10px rgba(33, 150, 243, 0.2);
+        }
+        
+        .version-select:focus {
+            outline: none;
+            border-color: #1565C0;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .version-select option {
+            padding: 15px;
+            font-size: 1em;
+        }
+        
+        
+        .version-details-panel {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .version-details-panel.active {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .details-header {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .detail-box strong {
+            display: block;
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .detail-box span {
+            font-size: 1.1em;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .features-section {
+            margin: 20px 0;
+        }
+        
+        .features-section h4 {
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+        
+        .features-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .features-section li {
+            padding: 10px 0 10px 30px;
+            color: #555;
+            position: relative;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .features-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 5px;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .badges-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-lts {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .badge-latest {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .badge-recommended {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .badge-beta {
+            background: #9c27b0;
+            color: white;
+        }
+        
+        .compatibility-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .compatibility-info strong {
+            display: block;
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        
+        .compatibility-info p {
+            color: #555;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+        
+        .upgrade-action {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .upgrade-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upgrade-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+        }
+        
+        .upgrade-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .upgrade-button:before {
+            content: "🚀";
+            font-size: 1.3em;
+        }
+        
+        .comparison-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-arrow {
+                transform: rotate(90deg);
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .modal-header h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .upgrade-steps {
+            margin: 25px 0;
+        }
+        
+        .step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .step-content h4 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .step-content p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box strong {
+            color: #ff9800;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn-secondary {
+            flex: 1;
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .btn-primary {
+            flex: 2;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 25px;
+        }
+        
+        .progress-section.active {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+        
+        .log-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-output p {
+            margin: 5px 0;
+            color: #ecf0f1;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 SonarQube Upgrade Manager</h1>
+            <p>Select a version and upgrade your SonarQube installation</p>
+        </div>
+        
+        <div class="content">
+            <div class="comparison-container">
+                <!-- Left Side: Current Version -->
+                <div class="version-panel current">
+                    <div class="panel-header">
+                        <div class="panel-icon">✓</div>
+                        <div class="panel-title">
+                            <h2>Current Version</h2>
+                            <p>Currently installed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="version-display">
+                        <div class="version-number-large">26.2.0</div>
+                        <div class="version-build">Build 119303</div>
+                        <div class="badges-container">
+                            <span class="version-badge badge-lts">Community Edition</span>
+                        </div>
+                        
+                        <div class="version-info">
+                            <div class="info-item">
+                                <strong>Release Date</strong>
+                                <span>Nov 10, 2025</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Java Version</strong>
+                                <span>OpenJDK 21.0.10</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Status</strong>
+                                <span style="color: #4caf50;">● Running</span>
+                            </div>
+                            <div class="info-item">
+                                <strong>Installation Path</strong>
+                                <span style="font-size: 0.85em;">~/Downloads/sonarqube-26.2.0.119303</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                        <h4 style="color: #2e7d32; margin-bottom: 10px;">Current Features</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0; color: #555; font-size: 0.9em;">✓ 28 language analyzers</li>
+                            <li style="padding: 5px 0; color: #555; font-size: 0.9em;">✓ Quality Gate support</li>
+                            <li style="padding: 5px 0; color: #555; font-size: 0.9em;">✓ GitHub/GitLab integration</li>
+                            <li style="padding: 5px 0; color: #555; font-size: 0.9em;">✓ Security hotspot detection</li>
+                            <li style="padding: 5px 0; color: #555; font-size: 0.9em;">✓ Pull Request decoration</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Right Side: Upgrade Options -->
+                <div class="version-panel upgrade">
+                    <div class="panel-header">
+                        <div class="panel-icon">⬆</div>
+                        <div class="panel-title">
+                            <h2>Upgrade To</h2>
+                            <p>Select version from dropdown</p>
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown-container">
+                        <label for="versionSelect">Available Versions:</label>
+                        <select id="versionSelect" class="version-select" onchange="showVersionDetails(this.value)">
+                            <option value="">-- Select Version to Upgrade --</option>
+                            <option value="27.0.0">SonarQube 27.0.0 (Latest - Recommended) ⭐</option>
+                            <option value="26.3.0">SonarQube 26.3.0 (LTS Patch) 🛡️</option>
+                            <option value="27.1.0">SonarQube 27.1.0 (Beta) 🧪</option>
+                            <option value="26.2.1">SonarQube 26.2.1 (Minor Update)</option>
+                            <option value="25.1.0">SonarQube 25.1.0 (Previous LTS)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Version Details (shown when selected) -->
+                    <div id="versionDetails" class="version-details-panel"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upgrade Modal -->
+    <div class="modal" id="upgradeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🚀 Confirm Upgrade</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div id="upgradeInfo">
+                <p style="color: #666; margin-bottom: 20px;">
+                    You are about to upgrade your SonarQube installation from 
+                    <strong id="fromVersion">26.2.0</strong> to 
+                    <strong id="toVersion">27.0.0</strong>
+                </p>
+                
+                <div class="upgrade-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h4>Backup Current Installation</h4>
+                            <p>Create a complete backup of database and configuration files</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h4>Stop SonarQube Server</h4>
+                            <p>Gracefully shutdown the current SonarQube instance</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h4>Download & Extract</h4>
+                            <p>Download new version and extract to installation directory</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h4>Migrate Configuration</h4>
+                            <p>Copy configuration files and migrate settings</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h4>Database Migration</h4>
+                            <p>Run automatic database schema migration</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-content">
+                            <h4>Start New Version</h4>
+                            <p>Launch upgraded SonarQube and verify installation</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Important</strong>
+                    This process will take approximately <strong id="estimatedTime">15-20 minutes</strong>. 
+                    SonarQube will be unavailable during this time. Make sure no analysis jobs are running.
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn-primary" onclick="startUpgrade()">Begin Upgrade Process</button>
+                </div>
+            </div>
+            
+            <!-- Progress Section (Hidden by default) -->
+            <div class="progress-section" id="progressSection">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Initializing upgrade...</div>
+                
+                <div class="log-output" id="logOutput">
+                    <p>[00:00] Starting upgrade process...</p>
+                </div>
+                
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button class="btn-secondary" onclick="closeModal()" id="closeProgressBtn" disabled>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Version data
+        const versions = {
+            '27.0.0': {
+                version: '27.0.0',
+                build: '120394',
+                releaseDate: 'January 15, 2026',
+                type: 'Major Release',
+                size: '1.2 GB',
+                upgradeTime: '15-20 minutes',
+                badges: ['Latest', 'Recommended'],
+                features: [
+                    'Enhanced AI-powered code analysis with machine learning improvements',
+                    'New security vulnerability detection for latest frameworks',
+                    'Performance improvements: 40% faster analysis for large projects',
+                    'Redesigned UI with dark mode support',
+                    'Advanced PR decoration with inline code suggestions',
+                    'Support for Python 3.12, Node.js 22, and Java 23',
+                    'Improved quality gate evaluation algorithms',
+                    'Better integration with CI/CD pipelines'
+                ],
+                requirements: 'Java 21+, Elasticsearch 8.15+',
+                warning: null
+            },
+            '26.3.0': {
+                version: '26.3.0',
+                build: '119856',
+                releaseDate: 'December 10, 2025',
+                type: 'Patch Release',
+                size: '1.0 GB',
+                upgradeTime: '10-15 minutes',
+                badges: ['LTS Patch'],
+                features: [
+                    'Critical security patch for authentication bypass vulnerability',
+                    'Fixed memory leak in large project analysis',
+                    'Improved GitHub integration stability',
+                    'Database migration performance improvements',
+                    'Bug fixes for JavaScript/TypeScript analysis',
+                    'Enhanced error logging and diagnostics'
+                ],
+                requirements: 'Java 17+, Elasticsearch 7.17+',
+                warning: null
+            },
+            '27.1.0': {
+                version: '27.1.0',
+                build: '121000',
+                releaseDate: 'February 1, 2026',
+                type: 'Beta Release',
+                size: '1.3 GB',
+                upgradeTime: '20 minutes',
+                badges: ['Beta'],
+                features: [
+                    'AI-assisted code fix recommendations (Preview)',
+                    'Real-time collaborative code review',
+                    'Advanced dependency vulnerability scanning',
+                    'Custom rule builder with visual editor',
+                    'Integration with VS Code extension',
+                    'Multi-branch parallel analysis',
+                    'Experimental machine learning models',
+                    'Enhanced API endpoints for third-party integrations'
+                ],
+                requirements: 'Java 21+, Elasticsearch 8.16+',
+                warning: '⚠️ Beta Version - Not recommended for production environments. Use for testing only.'
+            },
+            '26.2.1': {
+                version: '26.2.1',
+                build: '119450',
+                releaseDate: 'November 25, 2025',
+                type: 'Minor Update',
+                size: '1.0 GB',
+                upgradeTime: '10 minutes',
+                badges: [],
+                features: [
+                    'Performance optimizations for quality gate evaluation',
+                    'Enhanced Kotlin and Swift language support',
+                    'UI improvements for project dashboard',
+                    'Better error messages for configuration issues',
+                    'Updated security hotspots detection rules',
+                    'Minor bug fixes and stability improvements'
+                ],
+                requirements: 'Java 17+, Elasticsearch 7.17+',
+                warning: null
+            },
+            '25.1.0': {
+                version: '25.1.0',
+                build: '118500',
+                releaseDate: 'August 20, 2025',
+                type: 'Previous LTS',
+                size: '950 MB',
+                upgradeTime: '15 minutes',
+                badges: ['Previous LTS'],
+                features: [
+                    'Stable long-term support release',
+                    'Proven reliability for production environments',
+                    'Extended support until December 2026',
+                    'Compatible with older infrastructure',
+                    'Well-documented migration paths'
+                ],
+                requirements: 'Java 17+, Elasticsearch 7.17+',
+                warning: 'ℹ️ This is an older LTS version. Consider upgrading to 27.0.0 for latest features.'
+            }
+        };
+        
+        let selectedVersion = null;
+        
+        function showVersionDetails(versionKey) {
+            const detailsPanel = document.getElementById('versionDetails');
+            
+            if (!versionKey || !versions[versionKey]) {
+                detailsPanel.classList.remove('active');
+                return;
+            }
+            
+            selectedVersion = versions[versionKey];
+            const v = selectedVersion;
+            
+            // Build badges HTML
+            let badgesHTML = '';
+            if (v.badges && v.badges.length > 0) {
+                badgesHTML = '<div class="badges-container">';
+                v.badges.forEach(badge => {
+                    let badgeClass = 'version-badge';
+                    if (badge === 'Latest') badgeClass += ' badge-latest';
+                    else if (badge === 'Recommended') badgeClass += ' badge-recommended';
+                    else if (badge === 'LTS Patch' || badge === 'Previous LTS') badgeClass += ' badge-lts';
+                    else if (badge === 'Beta') badgeClass += ' badge-beta';
+                    badgesHTML += `<span class="${badgeClass}">${badge}</span>`;
+                });
+                badgesHTML += '</div>';
+            }
+            
+            // Build features HTML
+            let featuresHTML = '<ul>';
+            v.features.forEach(feature => {
+                featuresHTML += `<li>${feature}</li>`;
+            });
+            featuresHTML += '</ul>';
+            
+            // Build warning HTML
+            let warningHTML = '';
+            if (v.warning) {
+                warningHTML = `<div class="warning-box">${v.warning}</div>`;
+            }
+            
+            // Generate the details panel
+            detailsPanel.innerHTML = `
+                <div class="details-header">Version ${v.version} Details</div>
+                
+                <div class="version-number-large">${v.version}</div>
+                <div class="version-build">Build ${v.build} • Released: ${v.releaseDate}</div>
+                ${badgesHTML}
+                
+                <div class="details-grid">
+                    <div class="detail-box">
+                        <strong>Release Type</strong>
+                        <span>${v.type}</span>
+                    </div>
+                    <div class="detail-box">
+                        <strong>Download Size</strong>
+                        <span>${v.size}</span>
+                    </div>
+                    <div class="detail-box">
+                        <strong>Upgrade Time</strong>
+                        <span>${v.upgradeTime}</span>
+                    </div>
+                </div>
+                
+                <div class="features-section">
+                    <h4>✨ What's Included</h4>
+                    ${featuresHTML}
+                </div>
+                
+                <div class="compatibility-info">
+                    <strong>📋 Requirements</strong>
+                    <p>${v.requirements}</p>
+                </div>
+                
+                ${warningHTML}
+                
+                <div class="upgrade-action">
+                    <button class="upgrade-button" onclick="showUpgradeModal()">
+                        Upgrade to ${v.version}
+                    </button>
+                </div>
+            `;
+            
+            detailsPanel.classList.add('active');
+        }
+        
+        function showUpgradeModal() {
+            if (!selectedVersion) return;
+            
+            const currentVersion = '26.2.0';
+            document.getElementById('fromVersion').textContent = currentVersion;
+            document.getElementById('toVersion').textContent = selectedVersion.version;
+            document.getElementById('estimatedTime').textContent = selectedVersion.upgradeTime;
+            
+            document.getElementById('upgradeModal').classList.add('active');
+            document.getElementById('upgradeInfo').style.display = 'block';
+            document.getElementById('progressSection').classList.remove('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('upgradeModal').classList.remove('active');
+        }
+        
+        function startUpgrade() {
+            // Hide info, show progress
+            document.getElementById('upgradeInfo').style.display = 'none';
+            document.getElementById('progressSection').classList.add('active');
+            document.getElementById('closeProgressBtn').disabled = true;
+            
+            // Simulate upgrade process
+            simulateUpgrade();
+        }
+        
+        function simulateUpgrade() {
+            const steps = [
+                { progress: 10, text: 'Creating backup of current installation...', delay: 1000 },
+                { progress: 20, text: 'Backup completed successfully', delay: 1500 },
+                { progress: 25, text: 'Stopping SonarQube server...', delay: 1000 },
+                { progress: 30, text: 'Server stopped successfully', delay: 1000 },
+                { progress: 35, text: `Downloading SonarQube ${selectedVersion.version}...`, delay: 2000 },
+                { progress: 50, text: 'Download completed', delay: 1000 },
+                { progress: 55, text: 'Extracting files...', delay: 1500 },
+                { progress: 65, text: 'Migrating configuration files...', delay: 1000 },
+                { progress: 70, text: 'Configuration migrated successfully', delay: 1000 },
+                { progress: 75, text: 'Starting database migration...', delay: 2000 },
+                { progress: 85, text: 'Database migration completed', delay: 1500 },
+                { progress: 90, text: 'Starting upgraded SonarQube server...', delay: 2000 },
+                { progress: 95, text: 'Server started, running verification checks...', delay: 1500 },
+                { progress: 100, text: '✅ Upgrade completed successfully!', delay: 1000 }
+            ];
+            
+            let currentStep = 0;
+            const logOutput = document.getElementById('logOutput');
+            logOutput.innerHTML = '<p>[00:00] Starting upgrade process...</p>';
+            
+            function executeStep() {
+                if (currentStep >= steps.length) {
+                    document.getElementById('closeProgressBtn').disabled = false;
+                    logOutput.innerHTML += '<p style="color: #4caf50; font-weight: bold;">[COMPLETE] SonarQube has been upgraded successfully!</p>';
+                    logOutput.innerHTML += '<p style="color: #4caf50;">You can now close this dialog and refresh the page.</p>';
+                    return;
+                }
+                
+                const step = steps[currentStep];
+                document.getElementById('progressFill').style.width = step.progress + '%';
+                document.getElementById('progressText').textContent = step.text;
+                
+                const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false, minute: '2-digit', second: '2-digit' });
+                logOutput.innerHTML += `<p>[${timestamp}] ${step.text}</p>`;
+                logOutput.scrollTop = logOutput.scrollHeight;
+                
+                currentStep++;
+                setTimeout(executeStep, step.delay);
+            }
+            
+            executeStep();
+        }
+        
+        // Close modal on outside click
+        document.getElementById('upgradeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

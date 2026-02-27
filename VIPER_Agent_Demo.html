@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIPER AI Agent - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .demo-section {
+            margin: 60px 0;
+        }
+
+        .demo-section h3 {
+            font-size: 28px;
+            color: #667eea;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .feature-card .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h4 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .workflow-demo {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .step-content h5 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .step-content p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .code-demo {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .code-demo .comment {
+            color: #5c6370;
+        }
+
+        .code-demo .command {
+            color: #61afef;
+        }
+
+        .code-demo .output {
+            color: #98c379;
+        }
+
+        .capability-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .capability-matrix th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        .capability-matrix td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        .capability-matrix tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-badge.done {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .status-badge.planned {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px;
+            text-align: center;
+            border-radius: 12px;
+            margin: 60px 0;
+        }
+
+        .cta-section h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #667eea;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 5px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box h4 {
+            color: #388e3c;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 VIPER AI Onboarding Agent</h1>
+            <div class="subtitle">Automated DevOps Onboarding - From Code to Production</div>
+        </div>
+
+        <div class="main-content">
+            <div class="hero">
+                <h2>Automate Your VIPER Onboarding in Minutes</h2>
+                <p>An intelligent AI agent that analyzes your repository, generates VIPER configuration, creates GitHub workflows, and provides actionable recommendations - all automatically.</p>
+            </div>
+
+            <!-- What It Does -->
+            <div class="demo-section">
+                <h3>🎯 What This Bot Does</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="icon">🔍</div>
+                        <h4>Smart Analysis</h4>
+                        <p>Automatically detects your language, build tools, test frameworks, and infrastructure setup. Supports Java, Node.js, Python, .NET, Go, and more.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">📝</div>
+                        <h4>Config Generation</h4>
+                        <p>Creates production-ready viper_config.yaml with optimal settings for your tech stack, including security scanning, testing, and deployment.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🔄</div>
+                        <h4>Workflow Creation</h4>
+                        <p>Generates GitHub Actions workflows that integrate with VIPER pipeline for automated CI/CD on every pull request and merge.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">✅</div>
+                        <h4>Validation</h4>
+                        <p>Validates existing configurations against VIPER standards and identifies missing required fields or incompatible versions.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">💡</div>
+                        <h4>Recommendations</h4>
+                        <p>Provides actionable suggestions like adding Dockerfiles, setting up tests, or implementing database migrations.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🧪</div>
+                        <h4>Test Mode</h4>
+                        <p>Safe preview mode that shows what would be generated without modifying any files. Perfect for validation and learning.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="demo-section">
+                <h3>🔄 How It Works</h3>
+                <div class="workflow-demo">
+                    <div class="workflow-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h5>Repository Analysis</h5>
+                            <p>Agent scans your repository structure, identifies language and build tools (pom.xml, package.json, etc.), detects test frameworks, and checks for Docker and database migrations.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h5>Configuration Generation</h5>
+                            <p>Based on analysis, generates optimized viper_config.yaml with build settings, test configuration, security scanning (Snyk + SonarQube), deployment settings, and monitoring setup.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h5>Workflow Creation</h5>
+                            <p>Creates .github/workflows/viper.yml that triggers VIPER pipeline on pull requests and merges. Includes proper secret management for SNYK_TOKEN and SONAR_TOKEN.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h5>Validation & Recommendations</h5>
+                            <p>Validates the generated configuration against VIPER standards and provides recommendations for missing components like Dockerfile, tests, or migration tools.</p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h5>Report Generation</h5>
+                            <p>Creates comprehensive markdown report with analysis results, generated files, next steps, and complete agent logs for transparency.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Example -->
+            <div class="demo-section">
+                <h3>💻 Quick Start</h3>
+                
+                <div class="info-box">
+                    <h4>📦 Installation</h4>
+                    <div class="code-demo">
+<span class="comment"># Clone or navigate to your repository</span>
+<span class="command">cd /path/to/your/repository</span>
+
+<span class="comment"># Install dependencies</span>
+<span class="command">pip install pyyaml</span>
+
+<span class="comment"># Make agent executable</span>
+<span class="command">chmod +x viper_onboarding_agent.py</span>
+                    </div>
+                </div>
+
+                <h4 style="margin: 30px 0 20px;">Basic Usage Examples:</h4>
+
+                <div class="code-demo">
+<span class="comment"># 🔍 Analyze repository (safe preview)</span>
+<span class="command">python viper_onboarding_agent.py analyze . --test-mode</span>
+
+<span class="output">
+[2026-02-27 16:01:57] [INFO] 🔍 Analyzing repository: .
+[2026-02-27 16:01:57] [INFO] ✓ Detected language: java
+[2026-02-27 16:01:57] [INFO] ✓ Detected build tool: maven
+[2026-02-27 16:01:57] [INFO] ✓ Dockerfile: Found
+[2026-02-27 16:01:57] [INFO] ✓ Tests: Found
+[2026-02-27 16:01:57] [INFO] ✓ DB Migrations: Found
+</span>
+
+<span class="comment"># 📝 Generate VIPER configuration</span>
+<span class="command">python viper_onboarding_agent.py generate . --test-mode</span>
+
+<span class="output">
+[2026-02-27 16:01:57] [INFO] 📝 Generating viper_config.yaml
+[2026-02-27 16:01:57] [INFO] ✓ Configuration generated successfully
+[2026-02-27 16:01:57] [INFO] 📝 Generating GitHub Actions workflow
+[2026-02-27 16:01:57] [INFO] ✓ Workflow generated successfully
+</span>
+
+<span class="comment"># 🚀 Full onboarding with report</span>
+<span class="command">python viper_onboarding_agent.py onboard . \
+    --service-name payment-service \
+    --test-mode \
+    --report onboarding-report.md</span>
+
+<span class="output">
+✅ ONBOARDING COMPLETE
+Report saved to: onboarding-report.md
+</span>
+
+<span class="comment"># ✅ Validate existing configuration</span>
+<span class="command">python viper_onboarding_agent.py validate viper_config.yaml</span>
+
+<span class="output">
+✅ VALIDATION PASSED
+</span>
+                </div>
+            </div>
+
+            <!-- Capabilities -->
+            <div class="demo-section">
+                <h3>🎯 Agent Capabilities</h3>
+                <table class="capability-matrix">
+                    <tr>
+                        <th>Capability</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Language Detection</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Java, Node.js, Python, .NET, Go, Terraform</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Build Tool Detection</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Maven, Gradle, npm, pip, dotnet, go modules</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test Framework Detection</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>JUnit, Jest, pytest, xUnit, and more</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Docker Support</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Detects Dockerfile presence</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DB Migration Detection</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Flyway, Liquibase, Alembic</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Config Generation</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>viper_config.yaml with best practices</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitHub Actions Workflow</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>.github/workflows/viper.yml</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validation</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Checks existing configs for issues</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test Mode</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Safe preview without file changes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recommendations</strong></td>
+                        <td><span class="status-badge done">✅ Live</span></td>
+                        <td>Actionable improvement suggestions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-language Support</strong></td>
+                        <td><span class="status-badge planned">🔜 Planned</span></td>
+                        <td>Rust, Ruby, PHP coming soon</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Terraform Generation</strong></td>
+                        <td><span class="status-badge planned">🔜 Planned</span></td>
+                        <td>Auto-generate infrastructure code</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AWS Integration</strong></td>
+                        <td><span class="status-badge planned">🔜 Planned</span></td>
+                        <td>Auto-provision test environments</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Test Results -->
+            <div class="demo-section">
+                <h3>📊 Live Test Results</h3>
+                <div class="success-box">
+                    <h4>✅ All Tests Passed</h4>
+                    <p><strong>Test Execution:</strong> February 27, 2026 at 16:01:57</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ Java Maven Service: Detected language, build tool, Docker, tests, DB migrations</li>
+                        <li>✅ Node.js Express API: Detected npm, package.json, Jest, Dockerfile</li>
+                        <li>✅ Python Flask API: Detected pytest, requirements.txt, Docker</li>
+                        <li>✅ .NET API: Detected with recommendations for missing Dockerfile</li>
+                        <li>✅ Configuration generation successful for all test cases</li>
+                        <li>✅ GitHub workflow generation successful</li>
+                        <li>✅ Report generation completed with full logs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-section">
+                <h3>Ready to Automate Your VIPER Onboarding?</h3>
+                <p>Try the AI agent with your repository today. Start in test mode for a safe preview!</p>
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary" onclick="alert('Run: python viper_onboarding_agent.py analyze . --test-mode'); return false;">Get Started</a>
+                    <a href="README_VIPER_AGENT.md" class="btn btn-secondary">View Documentation</a>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="demo-section">
+                <h3>🚀 Next Steps for Your Team</h3>
+                
+                <div class="info-box">
+                    <h4>1. Test Environment Setup</h4>
+                    <p>Create dedicated test repositories to safely experiment with the agent before using on production codebases.</p>
+                </div>
+
+                <div class="info-box">
+                    <h4>2. Integration with Meeting Goals</h4>
+                    <p>This bot addresses your meeting goals:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✅ <strong>Automated DevOps processes</strong> - Eliminates manual VIPER onboarding</li>
+                        <li>✅ <strong>Terraform & scripts</strong> - Foundation for infrastructure automation</li>
+                        <li>✅ <strong>Agentic delivery model</strong> - Bot handles onboarding, humans supervise</li>
+                        <li>✅ <strong>Test environment</strong> - Built-in test mode for safe experimentation</li>
+                        <li>✅ <strong>Team upskilling</strong> - Learn by doing with real AI agent code</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>3. Extension Opportunities</h4>
+                    <p>Build additional agents based on this foundation:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>🔧 <strong>Database Backup Agent</strong> - Automate RDS backups with IAM credentials</li>
+                        <li>📦 <strong>Tool Upgrade Agent</strong> - Auto-upgrade SonarQube, Snyk, SecureWatch</li>
+                        <li>☁️ <strong>Infrastructure Agent</strong> - Generate Terraform for new environments</li>
+                        <li>🔍 <strong>Monitoring Agent</strong> - Setup Datadog dashboards automatically</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

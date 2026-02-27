@@ -1,0 +1,19 @@
+{
+  "name": "test-with-vulnerabilities",
+  "version": "1.0.0",
+  "description": "Test package with intentional security vulnerabilities",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests\" && exit 0"
+  },
+  "dependencies": {
+    "lodash": "4.17.15",
+    "axios": "0.18.0",
+    "express": "4.16.0",
+    "moment": "2.24.0",
+    "react": "16.8.0"
+  },
+  "devDependencies": {
+    "webpack": "4.29.0"
+  }
+}

@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonarQube GitHub App Setup Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+        
+        .code-block code {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .info-box strong {
+            color: #1976D2;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box strong {
+            color: #ff9800;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .success-box strong {
+            color: #155724;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .config-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .config-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .config-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .field-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        
+        li {
+            margin: 10px 0;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .permissions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .permission-item {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .permission-item strong {
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .permission-item span {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 SonarQube GitHub App Setup Guide</h1>
+            <p>Complete Configuration for Pull Request Decoration</p>
+        </div>
+        
+        <div class="content">
+            <!-- Overview Section -->
+            <div class="section">
+                <h2><span class="step-number">📋</span> Overview</h2>
+                <p>This guide walks you through creating and configuring a GitHub App to enable <strong>Pull Request Decoration</strong> in your local SonarQube instance. Pull Request Decoration allows SonarQube to:</p>
+                <ul>
+                    <li>Automatically comment on Pull Requests with code quality analysis</li>
+                    <li>Show Quality Gate status directly in GitHub</li>
+                    <li>Display code coverage and security issues on PR diffs</li>
+                    <li>Block or warn before merging if quality standards aren't met</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>📍 Your Setup:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Repository: <code>KONJETIVEERASHANKARUDU/testenvfor_sonar</code></li>
+                        <li>SonarQube: Community Edition 26.2.0 (http://localhost:9000)</li>
+                        <li>Current: SonarCloud enabled (production)</li>
+                        <li>Goal: Add local SonarQube PR decoration (learning/testing)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Step 1: Create GitHub App -->
+            <div class="section">
+                <h2><span class="step-number">1</span> Create GitHub App</h2>
+                
+                <h3>1.1 Navigate to GitHub Settings</h3>
+                <ol>
+                    <li>Go to your GitHub account: <a href="https://github.com/settings/apps" target="_blank">https://github.com/settings/apps</a></li>
+                    <li>Click on <strong>"Developer settings"</strong> (left sidebar)</li>
+                    <li>Click on <strong>"GitHub Apps"</strong></li>
+                    <li>Click <strong>"New GitHub App"</strong> button</li>
+                </ol>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> You're creating a GitHub App for your <strong>personal account</strong>, not an organization. If you want organization-wide access later, you can transfer the app.
+                </div>
+                
+                <h3>1.2 Basic Information</h3>
+                <table class="config-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="field-name">GitHub App name*</td>
+                            <td><code>SonarQube-Local-PR-Decoration</code></td>
+                            <td>Must be unique across GitHub</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Homepage URL*</td>
+                            <td><code>http://localhost:9000</code></td>
+                            <td>Your local SonarQube URL</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Callback URL</td>
+                            <td><code>http://localhost:9000/oauth2/callback/github</code></td>
+                            <td>OAuth callback for authentication</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Webhook URL</td>
+                            <td><code>http://localhost:9000/api/alm_integration/github/webhook</code></td>
+                            <td>For GitHub events (optional for basic setup)</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Webhook Secret</td>
+                            <td><em>Leave blank for now</em></td>
+                            <td>Only needed for GitHub Code Scanning</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box">
+                    <strong>💡 Note:</strong> Since this is a local instance, GitHub won't be able to reach your webhook URL. This is fine for manual analysis. If you later deploy SonarQube to a public server, update these URLs.
+                </div>
+                
+                <h3>1.3 Permissions</h3>
+                <p>Scroll down to the <strong>"Permissions"</strong> section and configure the following:</p>
+                
+                <div class="permissions-list">
+                    <div class="permission-item">
+                        <strong>Checks</strong>
+                        <span>Read & Write</span>
+                    </div>
+                    <div class="permission-item">
+                        <strong>Contents</strong>
+                        <span>Read-only</span>
+                    </div>
+                    <div class="permission-item">
+                        <strong>Metadata</strong>
+                        <span>Read-only (automatically set)</span>
+                    </div>
+                    <div class="permission-item">
+                        <strong>Pull requests</strong>
+                        <span>Read & Write</span>
+                    </div>
+                    <div class="permission-item">
+                        <strong>Commit statuses</strong>
+                        <span>Read & Write</span>
+                    </div>
+                </div>
+                
+                <h3>1.4 Subscribe to Events</h3>
+                <p>Under <strong>"Subscribe to events"</strong>, check:</p>
+                <ul>
+                    <li>✅ Pull request</li>
+                    <li>✅ Push</li>
+                </ul>
+                
+                <h3>1.5 Installation</h3>
+                <p>Under <strong>"Where can this GitHub App be installed?"</strong>:</p>
+                <ul>
+                    <li>Select: <strong>"Only on this account"</strong></li>
+                </ul>
+                
+                <h3>1.6 Create App</h3>
+                <ol>
+                    <li>Click <strong>"Create GitHub App"</strong> button at the bottom</li>
+                    <li>You'll be redirected to your new app's settings page</li>
+                </ol>
+                
+                <div class="success-box">
+                    <strong>✅ Success!</strong> Your GitHub App is created. Now let's collect the credentials.
+                </div>
+            </div>
+            
+            <!-- Step 2: Collect Credentials -->
+            <div class="section">
+                <h2><span class="step-number">2</span> Collect App Credentials</h2>
+                
+                <p>You should now be on your GitHub App's settings page. Let's collect the required information.</p>
+                
+                <h3>2.1 Get App ID</h3>
+                <div class="info-box">
+                    <strong>Location:</strong> Top of the page, under "About"<br>
+                    Look for: <strong>"App ID: 123456"</strong><br>
+                    <strong>Copy this number</strong> - you'll need it for SonarQube configuration.
+                </div>
+                
+                <h3>2.2 Get Client ID</h3>
+                <div class="info-box">
+                    <strong>Location:</strong> In the "General" section<br>
+                    Look for: <strong>"Client ID"</strong><br>
+                    Format: <code>Iv1.a1b2c3d4e5f6g7h8</code><br>
+                    <strong>Copy this value</strong>
+                </div>
+                
+                <h3>2.3 Generate Client Secret</h3>
+                <ol>
+                    <li>Find the <strong>"Client secrets"</strong> section</li>
+                    <li>Click <strong>"Generate a new client secret"</strong></li>
+                    <li>A secret will be generated (format: <code>abc123...xyz789</code>)</li>
+                    <li><strong>⚠️ Copy immediately!</strong> - You won't be able to see it again</li>
+                </ol>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Critical:</strong> Save this Client Secret immediately. GitHub will only show it once. If you lose it, you'll need to generate a new one.
+                </div>
+                
+                <h3>2.4 Generate Private Key</h3>
+                <ol>
+                    <li>Scroll down to <strong>"Private keys"</strong> section</li>
+                    <li>Click <strong>"Generate a private key"</strong></li>
+                    <li>A <code>.pem</code> file will download automatically</li>
+                    <li>Keep this file safe - you'll paste its contents into SonarQube</li>
+                </ol>
+                
+                <div class="code-block">
+                    <code># To view the private key contents on macOS:
+cat ~/Downloads/your-app-name.*.private-key.pem
+
+# The file looks like this:
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+...multiple lines of base64 encoded key...
+...
+-----END RSA PRIVATE KEY-----</code>
+                </div>
+                
+                <div class="success-box">
+                    <strong>✅ Credentials Collected!</strong> You should now have:
+                    <ul style="margin-top: 10px;">
+                        <li>✓ App ID (6-7 digit number)</li>
+                        <li>✓ Client ID (starts with "Iv1.")</li>
+                        <li>✓ Client Secret (long string)</li>
+                        <li>✓ Private Key (.pem file contents)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Step 3: Install App on Repository -->
+            <div class="section">
+                <h2><span class="step-number">3</span> Install App on Repository</h2>
+                
+                <h3>3.1 Install the App</h3>
+                <ol>
+                    <li>On your GitHub App settings page, click <strong>"Install App"</strong> (left sidebar)</li>
+                    <li>Click the <strong>"Install"</strong> button next to your account</li>
+                    <li>Choose installation option:
+                        <ul>
+                            <li><strong>All repositories</strong> - Gives access to all your repos (easier)</li>
+                            <li><strong>Only select repositories</strong> - Choose specific repos (more secure)</li>
+                        </ul>
+                    </li>
+                    <li>If choosing specific repos, select: <strong>testenvfor_sonar</strong></li>
+                    <li>Click <strong>"Install"</strong></li>
+                </ol>
+                
+                <div class="info-box">
+                    <strong>💡 Recommendation:</strong> For learning purposes, install on "All repositories". You can always revoke access later from Settings → Applications → Installed GitHub Apps.
+                </div>
+                
+                <div class="success-box">
+                    <strong>✅ Installation Complete!</strong> Your GitHub App now has access to your repository.
+                </div>
+            </div>
+            
+            <!-- Step 4: Configure SonarQube -->
+            <div class="section">
+                <h2><span class="step-number">4</span> Configure SonarQube</h2>
+                
+                <p>Now let's configure your local SonarQube instance with the GitHub App credentials.</p>
+                
+                <h3>4.1 Access Configuration Page</h3>
+                <ol>
+                    <li>Open SonarQube: <a href="http://localhost:9000" target="_blank">http://localhost:9000</a></li>
+                    <li>Login: <strong>admin</strong> / <strong>admin</strong> (change if prompted)</li>
+                    <li>Go to: <strong>Administration</strong> → <strong>Configuration</strong> → <strong>General Settings</strong></li>
+                    <li>In left sidebar, click: <strong>ALM Integrations</strong></li>
+                    <li>Click the <strong>GitHub</strong> tab</li>
+                    <li>Click <strong>"Create configuration"</strong></li>
+                </ol>
+                
+                <h3>4.2 Fill in Configuration Form</h3>
+                <table class="config-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Value</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="field-name">Configuration name*</td>
+                            <td><code>GitHub-testenvfor_sonar</code></td>
+                            <td>Any descriptive name</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">GitHub API URL*</td>
+                            <td><code>https://api.github.com/</code></td>
+                            <td>For GitHub.com (not Enterprise)</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">GitHub App ID*</td>
+                            <td><em>Your 6-7 digit App ID</em></td>
+                            <td>From Step 2.1</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Client ID*</td>
+                            <td><em>Your Client ID (Iv1.xxxxx)</em></td>
+                            <td>From Step 2.2</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Client Secret*</td>
+                            <td><em>Your Client Secret</em></td>
+                            <td>From Step 2.3</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Private Key*</td>
+                            <td><em>Entire contents of .pem file</em></td>
+                            <td>Include BEGIN/END lines</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Webhook Secret</td>
+                            <td><em>Leave blank</em></td>
+                            <td>Optional - for Code Scanning only</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>4.3 Paste Private Key</h3>
+                <div class="code-block">
+                    <code># Open the .pem file and copy ALL contents:
+cat ~/Downloads/sonarqube-local-pr-decoration.*.private-key.pem
+
+# Copy everything including:
+-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+...all lines...
+-----END RSA PRIVATE KEY-----</code>
+                </div>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> Paste the <strong>entire private key</strong> including the BEGIN and END lines. Don't add any extra spaces or newlines.
+                </div>
+                
+                <h3>4.4 Save Configuration</h3>
+                <ol>
+                    <li>Double-check all fields are filled correctly</li>
+                    <li>Click <strong>"Create"</strong> button</li>
+                    <li>SonarQube will validate the configuration</li>
+                </ol>
+                
+                <div class="success-box">
+                    <strong>✅ Configuration Saved!</strong> SonarQube is now connected to GitHub.
+                </div>
+            </div>
+            
+            <!-- Step 5: Create Project in SonarQube -->
+            <div class="section">
+                <h2><span class="step-number">5</span> Create SonarQube Project</h2>
+                
+                <h3>5.1 Create New Project</h3>
+                <ol>
+                    <li>From SonarQube home, click <strong>"Create Project"</strong></li>
+                    <li>Select <strong>"GitHub"</strong> as the source</li>
+                    <li>Click <strong>"Configure with GitHub"</strong></li>
+                    <li>Authorize SonarQube to access your GitHub account</li>
+                    <li>Select your repository: <strong>KONJETIVEERASHANKARUDU/testenvfor_sonar</strong></li>
+                    <li>Click <strong>"Set Up"</strong></li>
+                </ol>
+                
+                <h3>5.2 Configure Analysis</h3>
+                <ol>
+                    <li>Choose analysis method: <strong>"GitHub Actions"</strong></li>
+                    <li>SonarQube will show you're already set up (you have .github/workflows/sonarqube.yml)</li>
+                    <li>Note: You'll need to update your workflow to use local SonarQube instead of SonarCloud</li>
+                </ol>
+                
+                <div class="info-box">
+                    <strong>💡 Current Setup:</strong> Your repository already has SonarCloud configured. To test the local SonarQube:
+                    <ul style="margin-top: 10px;">
+                        <li>Option 1: Run analysis manually from your local machine</li>
+                        <li>Option 2: Create a separate workflow for local SonarQube (testing only)</li>
+                        <li>Option 3: Keep SonarCloud for production, use local for development</li>
+                    </ul>
+                </div>
+                
+                <h3>5.3 Generate Token for Local Analysis</h3>
+                <ol>
+                    <li>In SonarQube, click your profile icon → <strong>My Account</strong></li>
+                    <li>Go to <strong>Security</strong> tab</li>
+                    <li>Under "Generate Tokens": 
+                        <ul>
+                            <li>Name: <code>Local-Analysis-Token</code></li>
+                            <li>Type: <strong>Project Analysis Token</strong></li>
+                            <li>Project: <strong>testenvfor_sonar</strong></li>
+                        </ul>
+                    </li>
+                    <li>Click <strong>Generate</strong></li>
+                    <li><strong>⚠️ Copy the token immediately!</strong></li>
+                </ol>
+            </div>
+            
+            <!-- Step 6: Test the Integration -->
+            <div class="section">
+                <h2><span class="step-number">6</span> Test the Integration</h2>
+                
+                <h3>6.1 Run Local Analysis</h3>
+                <div class="code-block">
+                    <code># From your project directory:
+cd /Users/veera.konjeti/Desktop/testenvfor_sonar
+
+# Run SonarScanner with local SonarQube
+mvn clean verify sonar:sonar \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=YOUR_TOKEN_HERE \
+  -Dsonar.projectKey=testenvfor_sonar \
+  -Dsonar.projectName=testenvfor_sonar</code>
+                </div>
+                
+                <h3>6.2 Test Pull Request Decoration</h3>
+                <ol>
+                    <li>Create a test branch:
+                        <div class="code-block">
+                            <code>git checkout -b test-sonarqube-pr
+# Make a small change
+echo "// Test change" >> src/main/java/com/example/good/User.java
+git add .
+git commit -m "Test: SonarQube PR decoration"
+git push origin test-sonarqube-pr</code>
+                        </div>
+                    </li>
+                    <li>Create a Pull Request on GitHub</li>
+                    <li>Run analysis on the PR branch:
+                        <div class="code-block">
+                            <code>mvn clean verify sonar:sonar \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=YOUR_TOKEN_HERE \
+  -Dsonar.pullrequest.key=PR_NUMBER \
+  -Dsonar.pullrequest.branch=test-sonarqube-pr \
+  -Dsonar.pullrequest.base=main</code>
+                        </div>
+                    </li>
+                    <li>Check the PR on GitHub - you should see SonarQube checks!</li>
+                </ol>
+                
+                <div class="success-box">
+                    <strong>🎉 Success!</strong> If you see SonarQube quality gate status on your PR, the integration is working!
+                </div>
+            </div>
+            
+            <!-- Troubleshooting Section -->
+            <div class="section">
+                <h2><span class="step-number">🔧</span> Troubleshooting</h2>
+                
+                <h3>Common Issues</h3>
+                
+                <div class="warning-box">
+                    <strong>Issue:</strong> "Invalid Private Key"<br>
+                    <strong>Solution:</strong> Ensure you copied the entire .pem file contents including BEGIN/END lines. No extra spaces.
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Issue:</strong> "Failed to connect to GitHub API"<br>
+                    <strong>Solution:</strong> Check your internet connection. Verify GitHub API URL is exactly: <code>https://api.github.com/</code>
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Issue:</strong> "App not installed"<br>
+                    <strong>Solution:</strong> Make sure you completed Step 3 - installing the app on your repository.
+                </div>
+                
+                <div class="warning-box">
+                    <strong>Issue:</strong> PR decoration not appearing<br>
+                    <strong>Solution:</strong>
+                    <ul style="margin-top: 10px;">
+                        <li>Verify the app has "Checks" and "Pull requests" write permissions</li>
+                        <li>Ensure analysis ran with correct PR parameters</li>
+                        <li>Check SonarQube logs: <code>~/Downloads/sonarqube-26.2.0.119303/logs/web.log</code></li>
+                    </ul>
+                </div>
+                
+                <h3>Verification Checklist</h3>
+                <ul>
+                    <li>✓ GitHub App created with correct permissions</li>
+                    <li>✓ Private key generated and saved</li>
+                    <li>✓ App installed on repository</li>
+                    <li>✓ SonarQube configuration saved successfully</li>
+                    <li>✓ Project created in SonarQube</li>
+                    <li>✓ Analysis token generated</li>
+                    <li>✓ Local analysis runs successfully</li>
+                </ul>
+            </div>
+            
+            <!-- Reference Section -->
+            <div class="section">
+                <h2><span class="step-number">📚</span> Quick Reference</h2>
+                
+                <h3>Your Configuration Summary</h3>
+                <table class="config-table">
+                    <tbody>
+                        <tr>
+                            <td class="field-name">GitHub Repository</td>
+                            <td><code>KONJETIVEERASHANKARUDU/testenvfor_sonar</code></td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">SonarQube URL</td>
+                            <td><code>http://localhost:9000</code></td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">GitHub API URL</td>
+                            <td><code>https://api.github.com/</code></td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">SonarQube Edition</td>
+                            <td>Community Edition 26.2.0.119303</td>
+                        </tr>
+                        <tr>
+                            <td class="field-name">Java Version</td>
+                            <td>OpenJDK 21.0.10</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Useful Commands</h3>
+                <div class="code-block">
+                    <code># Start SonarQube
+cd ~/Downloads/sonarqube-26.2.0.119303
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./bin/macosx-universal-64/sonar.sh start
+
+# Stop SonarQube
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./bin/macosx-universal-64/sonar.sh stop
+
+# Check SonarQube status
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./bin/macosx-universal-64/sonar.sh status
+
+# View logs
+tail -f ~/Downloads/sonarqube-26.2.0.119303/logs/sonar.log
+
+# Run analysis locally
+mvn clean verify sonar:sonar \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.token=YOUR_TOKEN</code>
+                </div>
+                
+                <h3>Useful Links</h3>
+                <ul>
+                    <li><a href="http://localhost:9000" target="_blank">Local SonarQube Dashboard</a></li>
+                    <li><a href="https://github.com/settings/apps" target="_blank">GitHub Apps Settings</a></li>
+                    <li><a href="https://github.com/KONJETIVEERASHANKARUDU/testenvfor_sonar" target="_blank">Your Repository</a></li>
+                    <li><a href="https://docs.sonarsource.com/sonarqube/latest/devops-platform-integration/github-integration/" target="_blank">SonarQube GitHub Integration Docs</a></li>
+                </ul>
+            </div>
+            
+            <!-- Footer -->
+            <div class="section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                <h2 style="color: white;">🎉 You're All Set!</h2>
+                <p style="font-size: 1.1em; margin-top: 15px;">
+                    You now have a complete local SonarQube setup with GitHub integration for Pull Request decoration. 
+                    You can analyze code locally, test quality gates, and see results directly on GitHub PRs!
+                </p>
+                <p style="margin-top: 15px; opacity: 0.9;">
+                    <strong>Next Steps:</strong> Create a test PR, run analysis, and watch SonarQube add quality checks to your Pull Request! 🚀
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

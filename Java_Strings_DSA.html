@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Strings - Basic to Advanced DSA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 20px 30px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 24px;
+            margin: 30px 0 15px 0;
+        }
+
+        p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .code-block .comment {
+            color: #5c6370;
+        }
+
+        .code-block .keyword {
+            color: #c678dd;
+        }
+
+        .code-block .string {
+            color: #98c379;
+        }
+
+        .code-block .method {
+            color: #61afef;
+        }
+
+        .code-block .class {
+            color: #e5c07b;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 5px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box h4 {
+            color: #f57c00;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 5px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .success-box h4 {
+            color: #388e3c;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .complexity {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+
+        .complexity.time {
+            background: #4caf50;
+        }
+
+        .complexity.space {
+            background: #ff9800;
+        }
+
+        .problem-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .problem-card h4 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .difficulty.easy {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .difficulty.medium {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .difficulty.hard {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 14px;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        ul li, ol li {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .visual-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>☕ Java Strings DSA</h1>
+            <div class="subtitle">From Basic to Advanced - Complete Guide</div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab(0)">Basics</button>
+            <button class="nav-tab" onclick="showTab(1)">String Methods</button>
+            <button class="nav-tab" onclick="showTab(2)">StringBuilder</button>
+            <button class="nav-tab" onclick="showTab(3)">Pattern Matching</button>
+            <button class="nav-tab" onclick="showTab(4)">Manipulation</button>
+            <button class="nav-tab" onclick="showTab(5)">Advanced DSA</button>
+            <button class="nav-tab" onclick="showTab(6)">Interview Problems</button>
+        </div>
+
+        <div class="content">
+            <!-- Tab 1: Basics -->
+            <div class="tab-content active">
+                <h2>📚 String Basics in Java</h2>
+
+                <h3>1. What is a String?</h3>
+                <p>A String in Java is a sequence of characters. It's an object of the <code>String</code> class and is immutable (cannot be changed once created).</p>
+
+                <div class="code-block">
+<span class="comment">// Different ways to create strings</span>
+<span class="keyword">public class</span> <span class="class">StringBasics</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="comment">// 1. String Literal (stored in String Pool)</span>
+        String s1 = <span class="string">"Hello"</span>;
+        
+        <span class="comment">// 2. Using new keyword (stored in Heap)</span>
+        String s2 = <span class="keyword">new</span> String(<span class="string">"Hello"</span>);
+        
+        <span class="comment">// 3. From char array</span>
+        <span class="keyword">char</span>[] chars = {<span class="string">'H'</span>, <span class="string">'e'</span>, <span class="string">'l'</span>, <span class="string">'l'</span>, <span class="string">'o'</span>};
+        String s3 = <span class="keyword">new</span> String(chars);
+        
+        <span class="comment">// 4. From byte array</span>
+        <span class="keyword">byte</span>[] bytes = {72, 101, 108, 108, 111};
+        String s4 = <span class="keyword">new</span> String(bytes);
+        
+        System.out.<span class="method">println</span>(s1); <span class="comment">// Hello</span>
+        System.out.<span class="method">println</span>(s2); <span class="comment">// Hello</span>
+        System.out.<span class="method">println</span>(s3); <span class="comment">// Hello</span>
+        System.out.<span class="method">println</span>(s4); <span class="comment">// Hello</span>
+    }
+}
+</div>
+
+                <h3>2. String Immutability</h3>
+                <div class="info-box">
+                    <h4>💡 Key Concept: Immutability</h4>
+                    <p>Once a String object is created, it cannot be modified. Any operation that appears to modify a string actually creates a new string object.</p>
+                </div>
+
+                <div class="code-block">
+String str = <span class="string">"Hello"</span>;
+str.<span class="method">concat</span>(<span class="string">" World"</span>);
+System.out.<span class="method">println</span>(str); <span class="comment">// Still prints "Hello"</span>
+
+<span class="comment">// To actually change, reassign:</span>
+str = str.<span class="method">concat</span>(<span class="string">" World"</span>);
+System.out.<span class="method">println</span>(str); <span class="comment">// Now prints "Hello World"</span>
+</div>
+
+                <h3>3. String Pool</h3>
+                <p>String literals are stored in a special memory region called the String Pool for memory optimization.</p>
+
+                <div class="code-block">
+String s1 = <span class="string">"Java"</span>;
+String s2 = <span class="string">"Java"</span>;
+String s3 = <span class="keyword">new</span> String(<span class="string">"Java"</span>);
+
+System.out.<span class="method">println</span>(s1 == s2);        <span class="comment">// true (same reference in pool)</span>
+System.out.<span class="method">println</span>(s1 == s3);        <span class="comment">// false (different references)</span>
+System.out.<span class="method">println</span>(s1.<span class="method">equals</span>(s3)); <span class="comment">// true (same content)</span>
+</div>
+
+                <div class="visual-diagram">
+                    <strong>Memory Representation:</strong><br/><br/>
+                    String Pool: ["Java"] ← s1, s2<br/>
+                    Heap: String("Java") ← s3
+                </div>
+
+                <h3>4. Important String Characteristics</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Immutable</strong></td>
+                        <td>Cannot be changed once created</td>
+                        <td>str = "Hi" creates new object</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thread-Safe</strong></td>
+                        <td>Can be shared between threads</td>
+                        <td>No synchronization needed</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Comparable</strong></td>
+                        <td>Implements Comparable interface</td>
+                        <td>str1.compareTo(str2)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Serializable</strong></td>
+                        <td>Can be serialized</td>
+                        <td>Can send over network</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Tab 2: String Methods -->
+            <div class="tab-content">
+                <h2>🔧 Essential String Methods</h2>
+
+                <h3>1. Length & Character Access</h3>
+                <div class="code-block">
+String str = <span class="string">"Hello World"</span>;
+
+<span class="comment">// Get length</span>
+<span class="keyword">int</span> len = str.<span class="method">length</span>();
+System.out.<span class="method">println</span>(len); <span class="comment">// 11</span>
+
+<span class="comment">// Get character at index</span>
+<span class="keyword">char</span> ch = str.<span class="method">charAt</span>(0);
+System.out.<span class="method">println</span>(ch); <span class="comment">// 'H'</span>
+
+<span class="comment">// Convert to char array</span>
+<span class="keyword">char</span>[] chars = str.<span class="method">toCharArray</span>();
+</div>
+
+                <h3>2. Comparison Methods</h3>
+                <div class="code-block">
+String s1 = <span class="string">"Hello"</span>;
+String s2 = <span class="string">"hello"</span>;
+String s3 = <span class="string">"World"</span>;
+
+<span class="comment">// equals() - content comparison</span>
+<span class="keyword">boolean</span> isEqual = s1.<span class="method">equals</span>(s2);
+System.out.<span class="method">println</span>(isEqual); <span class="comment">// false</span>
+
+<span class="comment">// equalsIgnoreCase() - ignore case</span>
+<span class="keyword">boolean</span> isEqualIgnoreCase = s1.<span class="method">equalsIgnoreCase</span>(s2);
+System.out.<span class="method">println</span>(isEqualIgnoreCase); <span class="comment">// true</span>
+
+<span class="comment">// compareTo() - lexicographic comparison</span>
+<span class="keyword">int</span> result = s1.<span class="method">compareTo</span>(s3);
+System.out.<span class="method">println</span>(result); <span class="comment">// negative (H < W)</span>
+
+<span class="comment">// compareToIgnoreCase()</span>
+result = s1.<span class="method">compareToIgnoreCase</span>(s2);
+System.out.<span class="method">println</span>(result); <span class="comment">// 0 (equal ignoring case)</span>
+</div>
+
+                <h3>3. Search Methods</h3>
+                <div class="code-block">
+String str = <span class="string">"Hello World Hello"</span>;
+
+<span class="comment">// indexOf() - first occurrence</span>
+<span class="keyword">int</span> index = str.<span class="method">indexOf</span>(<span class="string">"Hello"</span>);
+System.out.<span class="method">println</span>(index); <span class="comment">// 0</span>
+
+<span class="comment">// lastIndexOf() - last occurrence</span>
+index = str.<span class="method">lastIndexOf</span>(<span class="string">"Hello"</span>);
+System.out.<span class="method">println</span>(index); <span class="comment">// 12</span>
+
+<span class="comment">// contains()</span>
+<span class="keyword">boolean</span> contains = str.<span class="method">contains</span>(<span class="string">"World"</span>);
+System.out.<span class="method">println</span>(contains); <span class="comment">// true</span>
+
+<span class="comment">// startsWith() & endsWith()</span>
+<span class="keyword">boolean</span> starts = str.<span class="method">startsWith</span>(<span class="string">"Hello"</span>);
+<span class="keyword">boolean</span> ends = str.<span class="method">endsWith</span>(<span class="string">"Hello"</span>);
+System.out.<span class="method">println</span>(starts + <span class="string">", "</span> + ends); <span class="comment">// true, true</span>
+</div>
+
+                <h3>4. Manipulation Methods</h3>
+                <div class="code-block">
+String str = <span class="string">"  Hello World  "</span>;
+
+<span class="comment">// substring()</span>
+String sub = str.<span class="method">substring</span>(2, 7);
+System.out.<span class="method">println</span>(sub); <span class="comment">// "Hello"</span>
+
+<span class="comment">// concat()</span>
+String result = str.<span class="method">concat</span>(<span class="string">"!"</span>);
+System.out.<span class="method">println</span>(result);
+
+<span class="comment">// replace()</span>
+String replaced = str.<span class="method">replace</span>(<span class="string">"World"</span>, <span class="string">"Java"</span>);
+System.out.<span class="method">println</span>(replaced);
+
+<span class="comment">// replaceAll() - regex</span>
+String replaceAll = str.<span class="method">replaceAll</span>(<span class="string">"\\s+"</span>, <span class="string">"-"</span>);
+System.out.<span class="method">println</span>(replaceAll);
+
+<span class="comment">// trim() - remove leading/trailing spaces</span>
+String trimmed = str.<span class="method">trim</span>();
+System.out.<span class="method">println</span>(trimmed); <span class="comment">// "Hello World"</span>
+
+<span class="comment">// strip() - Unicode aware (Java 11+)</span>
+String stripped = str.<span class="method">strip</span>();
+</div>
+
+                <h3>5. Case Conversion</h3>
+                <div class="code-block">
+String str = <span class="string">"Hello World"</span>;
+
+<span class="comment">// toUpperCase()</span>
+String upper = str.<span class="method">toUpperCase</span>();
+System.out.<span class="method">println</span>(upper); <span class="comment">// "HELLO WORLD"</span>
+
+<span class="comment">// toLowerCase()</span>
+String lower = str.<span class="method">toLowerCase</span>();
+System.out.<span class="method">println</span>(lower); <span class="comment">// "hello world"</span>
+</div>
+
+                <h3>6. Split & Join</h3>
+                <div class="code-block">
+String sentence = <span class="string">"Java,Python,JavaScript,C++"</span>;
+
+<span class="comment">// split() - returns array</span>
+String[] languages = sentence.<span class="method">split</span>(<span class="string">","</span>);
+<span class="keyword">for</span>(String lang : languages) {
+    System.out.<span class="method">println</span>(lang);
+}
+
+<span class="comment">// join() - static method (Java 8+)</span>
+String joined = String.<span class="method">join</span>(<span class="string">", "</span>, languages);
+System.out.<span class="method">println</span>(joined); <span class="comment">// "Java, Python, JavaScript, C++"</span>
+</div>
+
+                <h3>7. Utility Methods</h3>
+                <div class="code-block">
+String str = <span class="string">"Hello"</span>;
+
+<span class="comment">// isEmpty() - check if empty</span>
+<span class="keyword">boolean</span> empty = str.<span class="method">isEmpty</span>();
+System.out.<span class="method">println</span>(empty); <span class="comment">// false</span>
+
+<span class="comment">// isBlank() - check if blank (Java 11+)</span>
+<span class="keyword">boolean</span> blank = <span class="string">"   "</span>.<span class="method">isBlank</span>();
+System.out.<span class="method">println</span>(blank); <span class="comment">// true</span>
+
+<span class="comment">// matches() - regex</span>
+<span class="keyword">boolean</span> matches = <span class="string">"12345"</span>.<span class="method">matches</span>(<span class="string">"\\d+"</span>);
+System.out.<span class="method">println</span>(matches); <span class="comment">// true</span>
+
+<span class="comment">// intern() - add to string pool</span>
+String s1 = <span class="keyword">new</span> String(<span class="string">"Hello"</span>).<span class="method">intern</span>();
+</div>
+
+                <h3>8. Time Complexity Reference</h3>
+                <table>
+                    <tr>
+                        <th>Method</th>
+                        <th>Time Complexity</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>length()</td>
+                        <td>O(1)</td>
+                        <td>Direct field access</td>
+                    </tr>
+                    <tr>
+                        <td>charAt()</td>
+                        <td>O(1)</td>
+                        <td>Array index access</td>
+                    </tr>
+                    <tr>
+                        <td>substring()</td>
+                        <td>O(n)</td>
+                        <td>Creates new string</td>
+                    </tr>
+                    <tr>
+                        <td>concat()</td>
+                        <td>O(n)</td>
+                        <td>Creates new string</td>
+                    </tr>
+                    <tr>
+                        <td>indexOf()</td>
+                        <td>O(n*m)</td>
+                        <td>n = string length, m = pattern length</td>
+                    </tr>
+                    <tr>
+                        <td>equals()</td>
+                        <td>O(n)</td>
+                        <td>Compares each character</td>
+                    </tr>
+                    <tr>
+                        <td>split()</td>
+                        <td>O(n)</td>
+                        <td>Scans entire string</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Tab 3: StringBuilder -->
+            <div class="tab-content">
+                <h2>🏗️ StringBuilder & StringBuffer</h2>
+
+                <h3>1. Why StringBuilder?</h3>
+                <div class="warning-box">
+                    <h4>⚠️ Problem with String Concatenation</h4>
+                    <p>String concatenation with + operator creates many intermediate objects, leading to poor performance.</p>
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Bad: Creates 1000 intermediate String objects!</span>
+String result = <span class="string">""</span>;
+<span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < 1000; i++) {
+    result += i; <span class="comment">// Creates new string each time</span>
+}
+
+<span class="comment">// Good: StringBuilder is mutable</span>
+StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+<span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < 1000; i++) {
+    sb.<span class="method">append</span>(i); <span class="comment">// Modifies same object</span>
+}
+String result = sb.<span class="method">toString</span>();
+</div>
+
+                <h3>2. StringBuilder vs StringBuffer vs String</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>String</th>
+                        <th>StringBuilder</th>
+                        <th>StringBuffer</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Mutability</strong></td>
+                        <td>Immutable</td>
+                        <td>Mutable</td>
+                        <td>Mutable</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thread Safety</strong></td>
+                        <td>Yes</td>
+                        <td>No</td>
+                        <td>Yes (synchronized)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance</strong></td>
+                        <td>Slow (many objects)</td>
+                        <td>Fast</td>
+                        <td>Slower (sync overhead)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Use When</strong></td>
+                        <td>Few changes</td>
+                        <td>Many changes, single thread</td>
+                        <td>Many changes, multi-thread</td>
+                    </tr>
+                </table>
+
+                <h3>3. StringBuilder Methods</h3>
+                <div class="code-block">
+StringBuilder sb = <span class="keyword">new</span> StringBuilder(<span class="string">"Hello"</span>);
+
+<span class="comment">// append() - add at end</span>
+sb.<span class="method">append</span>(<span class="string">" World"</span>);
+sb.<span class="method">append</span>(123);
+sb.<span class="method">append</span>(<span class="keyword">true</span>);
+System.out.<span class="method">println</span>(sb); <span class="comment">// "Hello World123true"</span>
+
+<span class="comment">// insert() - add at specific position</span>
+sb.<span class="method">insert</span>(5, <span class="string">"-Java-"</span>);
+System.out.<span class="method">println</span>(sb);
+
+<span class="comment">// delete() - remove characters</span>
+sb.<span class="method">delete</span>(5, 11);
+System.out.<span class="method">println</span>(sb);
+
+<span class="comment">// deleteCharAt() - remove at index</span>
+sb.<span class="method">deleteCharAt</span>(0);
+
+<span class="comment">// replace() - replace substring</span>
+sb.<span class="method">replace</span>(0, 5, <span class="string">"Java"</span>);
+System.out.<span class="method">println</span>(sb);
+
+<span class="comment">// reverse() - reverse string</span>
+sb.<span class="method">reverse</span>();
+System.out.<span class="method">println</span>(sb);
+
+<span class="comment">// capacity() & length()</span>
+System.out.<span class="method">println</span>(<span class="string">"Length: "</span> + sb.<span class="method">length</span>());
+System.out.<span class="method">println</span>(<span class="string">"Capacity: "</span> + sb.<span class="method">capacity</span>());
+</div>
+
+                <h3>4. Performance Comparison</h3>
+                <div class="code-block">
+<span class="keyword">public class</span> <span class="class">PerformanceTest</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(String[] args) {
+        <span class="keyword">int</span> iterations = 10000;
+        
+        <span class="comment">// Test String concatenation</span>
+        <span class="keyword">long</span> start = System.<span class="method">currentTimeMillis</span>();
+        String str = <span class="string">""</span>;
+        <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < iterations; i++) {
+            str += <span class="string">"a"</span>;
+        }
+        <span class="keyword">long</span> end = System.<span class="method">currentTimeMillis</span>();
+        System.out.<span class="method">println</span>(<span class="string">"String: "</span> + (end - start) + <span class="string">"ms"</span>);
+        
+        <span class="comment">// Test StringBuilder</span>
+        start = System.<span class="method">currentTimeMillis</span>();
+        StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+        <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < iterations; i++) {
+            sb.<span class="method">append</span>(<span class="string">"a"</span>);
+        }
+        end = System.<span class="method">currentTimeMillis</span>();
+        System.out.<span class="method">println</span>(<span class="string">"StringBuilder: "</span> + (end - start) + <span class="string">"ms"</span>);
+        
+        <span class="comment">// StringBuilder is 100x+ faster!</span>
+    }
+}
+</div>
+
+                <div class="info-box">
+                    <h4>💡 Best Practice</h4>
+                    <p><strong>Use StringBuilder when:</strong></p>
+                    <ul>
+                        <li>Building strings in loops</li>
+                        <li>Doing many string modifications</li>
+                        <li>Performance matters</li>
+                        <li>Working in single-threaded context</li>
+                    </ul>
+                    <p><strong>Use String when:</strong></p>
+                    <ul>
+                        <li>Value won't change</li>
+                        <li>Few modifications needed</li>
+                        <li>Need thread safety for free</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Tab 4: Pattern Matching -->
+            <div class="tab-content">
+                <h2>🔎 Pattern Matching Algorithms</h2>
+
+                <h3>1. Naive Pattern Matching</h3>
+                <div class="problem-card">
+                    <h4>Problem: Find all occurrences of pattern in text</h4>
+                    <span class="difficulty easy">Easy</span>
+                    <p><strong>Input:</strong> text = "AABAACAADAABAAABAA", pattern = "AABA"</p>
+                    <p><strong>Output:</strong> [0, 9, 13]</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static</span> List<Integer> <span class="method">naiveSearch</span>(String text, String pattern) {
+    List<Integer> result = <span class="keyword">new</span> ArrayList<>();
+    <span class="keyword">int</span> n = text.<span class="method">length</span>();
+    <span class="keyword">int</span> m = pattern.<span class="method">length</span>();
+    
+    <span class="comment">// Check each position</span>
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i <= n - m; i++) {
+        <span class="keyword">int</span> j;
+        <span class="comment">// Check if pattern matches at position i</span>
+        <span class="keyword">for</span>(j = 0; j < m; j++) {
+            <span class="keyword">if</span>(text.<span class="method">charAt</span>(i + j) != pattern.<span class="method">charAt</span>(j)) {
+                <span class="keyword">break</span>;
+            }
+        }
+        <span class="keyword">if</span>(j == m) {
+            result.<span class="method">add</span>(i);
+        }
+    }
+    <span class="keyword">return</span> result;
+}
+</div>
+                <span class="complexity time">Time: O(n*m)</span>
+                <span class="complexity space">Space: O(1)</span>
+
+                <h3>2. KMP Algorithm (Knuth-Morris-Pratt)</h3>
+                <div class="info-box">
+                    <h4>💡 KMP Optimization</h4>
+                    <p>KMP avoids re-checking characters by using LPS (Longest Proper Prefix which is also Suffix) array.</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static void</span> <span class="method">KMPSearch</span>(String text, String pattern) {
+    <span class="keyword">int</span> n = text.<span class="method">length</span>();
+    <span class="keyword">int</span> m = pattern.<span class="method">length</span>();
+    
+    <span class="comment">// Compute LPS array</span>
+    <span class="keyword">int</span>[] lps = <span class="method">computeLPS</span>(pattern);
+    
+    <span class="keyword">int</span> i = 0; <span class="comment">// index for text</span>
+    <span class="keyword">int</span> j = 0; <span class="comment">// index for pattern</span>
+    
+    <span class="keyword">while</span>(i < n) {
+        <span class="keyword">if</span>(pattern.<span class="method">charAt</span>(j) == text.<span class="method">charAt</span>(i)) {
+            i++;
+            j++;
+        }
+        
+        <span class="keyword">if</span>(j == m) {
+            System.out.<span class="method">println</span>(<span class="string">"Pattern found at index "</span> + (i - j));
+            j = lps[j - 1];
+        } <span class="keyword">else if</span>(i < n && pattern.<span class="method">charAt</span>(j) != text.<span class="method">charAt</span>(i)) {
+            <span class="keyword">if</span>(j != 0) {
+                j = lps[j - 1];
+            } <span class="keyword">else</span> {
+                i++;
+            }
+        }
+    }
+}
+
+<span class="keyword">private static int</span>[] <span class="method">computeLPS</span>(String pattern) {
+    <span class="keyword">int</span> m = pattern.<span class="method">length</span>();
+    <span class="keyword">int</span>[] lps = <span class="keyword">new int</span>[m];
+    <span class="keyword">int</span> len = 0;
+    <span class="keyword">int</span> i = 1;
+    
+    lps[0] = 0;
+    
+    <span class="keyword">while</span>(i < m) {
+        <span class="keyword">if</span>(pattern.<span class="method">charAt</span>(i) == pattern.<span class="method">charAt</span>(len)) {
+            len++;
+            lps[i] = len;
+            i++;
+        } <span class="keyword">else</span> {
+            <span class="keyword">if</span>(len != 0) {
+                len = lps[len - 1];
+            } <span class="keyword">else</span> {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+    <span class="keyword">return</span> lps;
+}
+</div>
+                <span class="complexity time">Time: O(n+m)</span>
+                <span class="complexity space">Space: O(m)</span>
+
+                <h3>3. Rabin-Karp Algorithm</h3>
+                <div class="info-box">
+                    <h4>💡 Hashing Approach</h4>
+                    <p>Uses rolling hash to compare pattern with substrings efficiently.</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static void</span> <span class="method">rabinKarp</span>(String text, String pattern) {
+    <span class="keyword">int</span> d = 256; <span class="comment">// number of characters</span>
+    <span class="keyword">int</span> q = 101; <span class="comment">// prime number</span>
+    <span class="keyword">int</span> n = text.<span class="method">length</span>();
+    <span class="keyword">int</span> m = pattern.<span class="method">length</span>();
+    <span class="keyword">int</span> h = 1;
+    
+    <span class="comment">// h = d^(m-1) % q</span>
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < m - 1; i++) {
+        h = (h * d) % q;
+    }
+    
+    <span class="comment">// Calculate hash for pattern and first window</span>
+    <span class="keyword">int</span> p = 0; <span class="comment">// hash value for pattern</span>
+    <span class="keyword">int</span> t = 0; <span class="comment">// hash value for text</span>
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < m; i++) {
+        p = (d * p + pattern.<span class="method">charAt</span>(i)) % q;
+        t = (d * t + text.<span class="method">charAt</span>(i)) % q;
+    }
+    
+    <span class="comment">// Slide pattern over text</span>
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i <= n - m; i++) {
+        <span class="keyword">if</span>(p == t) {
+            <span class="comment">// Check character by character</span>
+            <span class="keyword">boolean</span> match = <span class="keyword">true</span>;
+            <span class="keyword">for</span>(<span class="keyword">int</span> j = 0; j < m; j++) {
+                <span class="keyword">if</span>(text.<span class="method">charAt</span>(i + j) != pattern.<span class="method">charAt</span>(j)) {
+                    match = <span class="keyword">false</span>;
+                    <span class="keyword">break</span>;
+                }
+            }
+            <span class="keyword">if</span>(match) {
+                System.out.<span class="method">println</span>(<span class="string">"Pattern found at index "</span> + i);
+            }
+        }
+        
+        <span class="comment">// Calculate hash for next window</span>
+        <span class="keyword">if</span>(i < n - m) {
+            t = (d * (t - text.<span class="method">charAt</span>(i) * h) + text.<span class="method">charAt</span>(i + m)) % q;
+            <span class="keyword">if</span>(t < 0) {
+                t = t + q;
+            }
+        }
+    }
+}
+</div>
+                <span class="complexity time">Time: O(n+m) average, O(n*m) worst</span>
+                <span class="complexity space">Space: O(1)</span>
+            </div>
+
+            <!-- Tab 5: Manipulation -->
+            <div class="tab-content">
+                <h2>✂️ String Manipulation Problems</h2>
+
+                <h3>1. Reverse a String</h3>
+                <div class="problem-card">
+                    <h4>Problem: Reverse a string</h4>
+                    <span class="difficulty easy">Easy</span>
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Method 1: Using StringBuilder</span>
+<span class="keyword">public static</span> String <span class="method">reverse1</span>(String str) {
+    <span class="keyword">return new</span> StringBuilder(str).<span class="method">reverse</span>().<span class="method">toString</span>();
+}
+
+<span class="comment">// Method 2: Using char array</span>
+<span class="keyword">public static</span> String <span class="method">reverse2</span>(String str) {
+    <span class="keyword">char</span>[] chars = str.<span class="method">toCharArray</span>();
+    <span class="keyword">int</span> left = 0, right = chars.length - 1;
+    
+    <span class="keyword">while</span>(left < right) {
+        <span class="keyword">char</span> temp = chars[left];
+        chars[left] = chars[right];
+        chars[right] = temp;
+        left++;
+        right--;
+    }
+    <span class="keyword">return new</span> String(chars);
+}
+
+<span class="comment">// Method 3: Recursive</span>
+<span class="keyword">public static</span> String <span class="method">reverse3</span>(String str) {
+    <span class="keyword">if</span>(str.<span class="method">isEmpty</span>()) {
+        <span class="keyword">return</span> str;
+    }
+    <span class="keyword">return</span> <span class="method">reverse3</span>(str.<span class="method">substring</span>(1)) + str.<span class="method">charAt</span>(0);
+}
+</div>
+
+                <h3>2. Check Palindrome</h3>
+                <div class="code-block">
+<span class="keyword">public static boolean</span> <span class="method">isPalindrome</span>(String str) {
+    <span class="keyword">int</span> left = 0, right = str.<span class="method">length</span>() - 1;
+    
+    <span class="keyword">while</span>(left < right) {
+        <span class="keyword">if</span>(str.<span class="method">charAt</span>(left) != str.<span class="method">charAt</span>(right)) {
+            <span class="keyword">return false</span>;
+        }
+        left++;
+        right--;
+    }
+    <span class="keyword">return true</span>;
+}
+
+<span class="comment">// Ignore case and non-alphanumeric</span>
+<span class="keyword">public static boolean</span> <span class="method">isPalindromeIgnoreCase</span>(String str) {
+    str = str.<span class="method">toLowerCase</span>().<span class="method">replaceAll</span>(<span class="string">"[^a-z0-9]"</span>, <span class="string">""</span>);
+    <span class="keyword">return</span> <span class="method">isPalindrome</span>(str);
+}
+</div>
+
+                <h3>3. Check Anagram</h3>
+                <div class="code-block">
+<span class="comment">// Method 1: Sorting</span>
+<span class="keyword">public static boolean</span> <span class="method">isAnagram1</span>(String s1, String s2) {
+    <span class="keyword">if</span>(s1.<span class="method">length</span>() != s2.<span class="method">length</span>()) {
+        <span class="keyword">return false</span>;
+    }
+    
+    <span class="keyword">char</span>[] arr1 = s1.<span class="method">toCharArray</span>();
+    <span class="keyword">char</span>[] arr2 = s2.<span class="method">toCharArray</span>();
+    
+    Arrays.<span class="method">sort</span>(arr1);
+    Arrays.<span class="method">sort</span>(arr2);
+    
+    <span class="keyword">return</span> Arrays.<span class="method">equals</span>(arr1, arr2);
+}
+
+<span class="comment">// Method 2: Frequency count</span>
+<span class="keyword">public static boolean</span> <span class="method">isAnagram2</span>(String s1, String s2) {
+    <span class="keyword">if</span>(s1.<span class="method">length</span>() != s2.<span class="method">length</span>()) {
+        <span class="keyword">return false</span>;
+    }
+    
+    <span class="keyword">int</span>[] count = <span class="keyword">new int</span>[26];
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < s1.<span class="method">length</span>(); i++) {
+        count[s1.<span class="method">charAt</span>(i) - <span class="string">'a'</span>]++;
+        count[s2.<span class="method">charAt</span>(i) - <span class="string">'a'</span>]--;
+    }
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> c : count) {
+        <span class="keyword">if</span>(c != 0) {
+            <span class="keyword">return false</span>;
+        }
+    }
+    <span class="keyword">return true</span>;
+}
+</div>
+
+                <h3>4. Remove Duplicates</h3>
+                <div class="code-block">
+<span class="comment">// Remove duplicate characters</span>
+<span class="keyword">public static</span> String <span class="method">removeDuplicates</span>(String str) {
+    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+    Set<Character> seen = <span class="keyword">new</span> HashSet<>();
+    
+    <span class="keyword">for</span>(<span class="keyword">char</span> c : str.<span class="method">toCharArray</span>()) {
+        <span class="keyword">if</span>(!seen.<span class="method">contains</span>(c)) {
+            seen.<span class="method">add</span>(c);
+            sb.<span class="method">append</span>(c);
+        }
+    }
+    <span class="keyword">return</span> sb.<span class="method">toString</span>();
+}
+
+<span class="comment">// Remove consecutive duplicates</span>
+<span class="keyword">public static</span> String <span class="method">removeConsecutiveDuplicates</span>(String str) {
+    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < str.<span class="method">length</span>(); i++) {
+        <span class="keyword">if</span>(i == 0 || str.<span class="method">charAt</span>(i) != str.<span class="method">charAt</span>(i-1)) {
+            sb.<span class="method">append</span>(str.<span class="method">charAt</span>(i));
+        }
+    }
+    <span class="keyword">return</span> sb.<span class="method">toString</span>();
+}
+</div>
+
+                <h3>5. Count Vowels and Consonants</h3>
+                <div class="code-block">
+<span class="keyword">public static void</span> <span class="method">countVowelsConsonants</span>(String str) {
+    <span class="keyword">int</span> vowels = 0, consonants = 0;
+    str = str.<span class="method">toLowerCase</span>();
+    
+    <span class="keyword">for</span>(<span class="keyword">char</span> c : str.<span class="method">toCharArray</span>()) {
+        <span class="keyword">if</span>(Character.<span class="method">isLetter</span>(c)) {
+            <span class="keyword">if</span>(c == <span class="string">'a'</span> || c == <span class="string">'e'</span> || c == <span class="string">'i'</span> || c == <span class="string">'o'</span> || c == <span class="string">'u'</span>) {
+                vowels++;
+            } <span class="keyword">else</span> {
+                consonants++;
+            }
+        }
+    }
+    
+    System.out.<span class="method">println</span>(<span class="string">"Vowels: "</span> + vowels);
+    System.out.<span class="method">println</span>(<span class="string">"Consonants: "</span> + consonants);
+}
+</div>
+
+                <h3>6. Rotate String</h3>
+                <div class="code-block">
+<span class="comment">// Check if s2 is rotation of s1</span>
+<span class="keyword">public static boolean</span> <span class="method">isRotation</span>(String s1, String s2) {
+    <span class="keyword">if</span>(s1.<span class="method">length</span>() != s2.<span class="method">length</span>()) {
+        <span class="keyword">return false</span>;
+    }
+    String combined = s1 + s1;
+    <span class="keyword">return</span> combined.<span class="method">contains</span>(s2);
+}
+
+<span class="comment">// Example: "abcd" and "cdab" are rotations</span>
+System.out.<span class="method">println</span>(<span class="method">isRotation</span>(<span class="string">"abcd"</span>, <span class="string">"cdab"</span>)); <span class="comment">// true</span>
+</div>
+
+                <h3>7. Reverse Words in String</h3>
+                <div class="code-block">
+<span class="keyword">public static</span> String <span class="method">reverseWords</span>(String str) {
+    String[] words = str.<span class="method">trim</span>().<span class="method">split</span>(<span class="string">"\\s+"</span>);
+    StringBuilder sb = <span class="keyword">new</span> StringBuilder();
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = words.length - 1; i >= 0; i--) {
+        sb.<span class="method">append</span>(words[i]);
+        <span class="keyword">if</span>(i > 0) {
+            sb.<span class="method">append</span>(<span class="string">" "</span>);
+        }
+    }
+    <span class="keyword">return</span> sb.<span class="method">toString</span>();
+}
+
+<span class="comment">// Input: "Hello World Java"</span>
+<span class="comment">// Output: "Java World Hello"</span>
+</div>
+            </div>
+
+            <!-- Tab 6: Advanced DSA -->
+            <div class="tab-content">
+                <h2>🚀 Advanced String DSA</h2>
+
+                <h3>1. Longest Palindromic Substring</h3>
+                <div class="problem-card">
+                    <h4>Find the longest palindromic substring</h4>
+                    <span class="difficulty medium">Medium</span>
+                    <p><strong>Input:</strong> "babad"</p>
+                    <p><strong>Output:</strong> "bab" or "aba"</p>
+                </div>
+
+                <div class="code-block">
+<span class="comment">// Expand around center approach</span>
+<span class="keyword">public static</span> String <span class="method">longestPalindrome</span>(String s) {
+    <span class="keyword">if</span>(s == <span class="keyword">null</span> || s.<span class="method">length</span>() < 1) <span class="keyword">return</span> <span class="string">""</span>;
+    
+    <span class="keyword">int</span> start = 0, end = 0;
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i < s.<span class="method">length</span>(); i++) {
+        <span class="comment">// Odd length palindromes</span>
+        <span class="keyword">int</span> len1 = <span class="method">expandAroundCenter</span>(s, i, i);
+        <span class="comment">// Even length palindromes</span>
+        <span class="keyword">int</span> len2 = <span class="method">expandAroundCenter</span>(s, i, i + 1);
+        
+        <span class="keyword">int</span> len = Math.<span class="method">max</span>(len1, len2);
+        
+        <span class="keyword">if</span>(len > end - start) {
+            start = i - (len - 1) / 2;
+            end = i + len / 2;
+        }
+    }
+    
+    <span class="keyword">return</span> s.<span class="method">substring</span>(start, end + 1);
+}
+
+<span class="keyword">private static int</span> <span class="method">expandAroundCenter</span>(String s, <span class="keyword">int</span> left, <span class="keyword">int</span> right) {
+    <span class="keyword">while</span>(left >= 0 && right < s.<span class="method">length</span>() && 
+          s.<span class="method">charAt</span>(left) == s.<span class="method">charAt</span>(right)) {
+        left--;
+        right++;
+    }
+    <span class="keyword">return</span> right - left - 1;
+}
+</div>
+                <span class="complexity time">Time: O(n²)</span>
+                <span class="complexity space">Space: O(1)</span>
+
+                <h3>2. Longest Common Subsequence (LCS)</h3>
+                <div class="code-block">
+<span class="keyword">public static int</span> <span class="method">lcs</span>(String s1, String s2) {
+    <span class="keyword">int</span> m = s1.<span class="method">length</span>();
+    <span class="keyword">int</span> n = s2.<span class="method">length</span>();
+    <span class="keyword">int</span>[][] dp = <span class="keyword">new int</span>[m + 1][n + 1];
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 1; i <= m; i++) {
+        <span class="keyword">for</span>(<span class="keyword">int</span> j = 1; j <= n; j++) {
+            <span class="keyword">if</span>(s1.<span class="method">charAt</span>(i-1) == s2.<span class="method">charAt</span>(j-1)) {
+                dp[i][j] = dp[i-1][j-1] + 1;
+            } <span class="keyword">else</span> {
+                dp[i][j] = Math.<span class="method">max</span>(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+    }
+    
+    <span class="keyword">return</span> dp[m][n];
+}
+</div>
+                <span class="complexity time">Time: O(m*n)</span>
+                <span class="complexity space">Space: O(m*n)</span>
+
+                <h3>3. Edit Distance (Levenshtein)</h3>
+                <div class="problem-card">
+                    <h4>Minimum edit operations to convert s1 to s2</h4>
+                    <span class="difficulty hard">Hard</span>
+                    <p><strong>Operations:</strong> Insert, Delete, Replace</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static int</span> <span class="method">editDistance</span>(String s1, String s2) {
+    <span class="keyword">int</span> m = s1.<span class="method">length</span>();
+    <span class="keyword">int</span> n = s2.<span class="method">length</span>();
+    <span class="keyword">int</span>[][] dp = <span class="keyword">new int</span>[m + 1][n + 1];
+    
+    <span class="comment">// Base cases</span>
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 0; i <= m; i++) {
+        dp[i][0] = i; <span class="comment">// delete all chars</span>
+    }
+    <span class="keyword">for</span>(<span class="keyword">int</span> j = 0; j <= n; j++) {
+        dp[0][j] = j; <span class="comment">// insert all chars</span>
+    }
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 1; i <= m; i++) {
+        <span class="keyword">for</span>(<span class="keyword">int</span> j = 1; j <= n; j++) {
+            <span class="keyword">if</span>(s1.<span class="method">charAt</span>(i-1) == s2.<span class="method">charAt</span>(j-1)) {
+                dp[i][j] = dp[i-1][j-1];
+            } <span class="keyword">else</span> {
+                dp[i][j] = 1 + Math.<span class="method">min</span>(
+                    dp[i-1][j],    <span class="comment">// delete</span>
+                    Math.<span class="method">min</span>(
+                        dp[i][j-1],    <span class="comment">// insert</span>
+                        dp[i-1][j-1]   <span class="comment">// replace</span>
+                    )
+                );
+            }
+        }
+    }
+    
+    <span class="keyword">return</span> dp[m][n];
+}
+</div>
+
+                <h3>4. Z-Algorithm (Pattern Matching)</h3>
+                <div class="code-block">
+<span class="keyword">public static int</span>[] <span class="method">zAlgorithm</span>(String str) {
+    <span class="keyword">int</span> n = str.<span class="method">length</span>();
+    <span class="keyword">int</span>[] z = <span class="keyword">new int</span>[n];
+    <span class="keyword">int</span> left = 0, right = 0;
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> i = 1; i < n; i++) {
+        <span class="keyword">if</span>(i > right) {
+            left = right = i;
+            <span class="keyword">while</span>(right < n && str.<span class="method">charAt</span>(right - left) == str.<span class="method">charAt</span>(right)) {
+                right++;
+            }
+            z[i] = right - left;
+            right--;
+        } <span class="keyword">else</span> {
+            <span class="keyword">int</span> k = i - left;
+            <span class="keyword">if</span>(z[k] < right - i + 1) {
+                z[i] = z[k];
+            } <span class="keyword">else</span> {
+                left = i;
+                <span class="keyword">while</span>(right < n && str.<span class="method">charAt</span>(right - left) == str.<span class="method">charAt</span>(right)) {
+                    right++;
+                }
+                z[i] = right - left;
+                right--;
+            }
+        }
+    }
+    <span class="keyword">return</span> z;
+}
+</div>
+                <span class="complexity time">Time: O(n)</span>
+                <span class="complexity space">Space: O(n)</span>
+
+                <h3>5. Trie (Prefix Tree)</h3>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="class">TrieNode</span> {
+    TrieNode[] children = <span class="keyword">new</span> TrieNode[26];
+    <span class="keyword">boolean</span> isEndOfWord;
+}
+
+<span class="keyword">class</span> <span class="class">Trie</span> {
+    <span class="keyword">private</span> TrieNode root;
+    
+    <span class="keyword">public</span> <span class="method">Trie</span>() {
+        root = <span class="keyword">new</span> TrieNode();
+    }
+    
+    <span class="comment">// Insert word</span>
+    <span class="keyword">public void</span> <span class="method">insert</span>(String word) {
+        TrieNode node = root;
+        <span class="keyword">for</span>(<span class="keyword">char</span> c : word.<span class="method">toCharArray</span>()) {
+            <span class="keyword">int</span> index = c - <span class="string">'a'</span>;
+            <span class="keyword">if</span>(node.children[index] == <span class="keyword">null</span>) {
+                node.children[index] = <span class="keyword">new</span> TrieNode();
+            }
+            node = node.children[index];
+        }
+        node.isEndOfWord = <span class="keyword">true</span>;
+    }
+    
+    <span class="comment">// Search word</span>
+    <span class="keyword">public boolean</span> <span class="method">search</span>(String word) {
+        TrieNode node = <span class="method">searchNode</span>(word);
+        <span class="keyword">return</span> node != <span class="keyword">null</span> && node.isEndOfWord;
+    }
+    
+    <span class="comment">// Check prefix</span>
+    <span class="keyword">public boolean</span> <span class="method">startsWith</span>(String prefix) {
+        <span class="keyword">return</span> <span class="method">searchNode</span>(prefix) != <span class="keyword">null</span>;
+    }
+    
+    <span class="keyword">private</span> TrieNode <span class="method">searchNode</span>(String word) {
+        TrieNode node = root;
+        <span class="keyword">for</span>(<span class="keyword">char</span> c : word.<span class="method">toCharArray</span>()) {
+            <span class="keyword">int</span> index = c - <span class="string">'a'</span>;
+            <span class="keyword">if</span>(node.children[index] == <span class="keyword">null</span>) {
+                <span class="keyword">return null</span>;
+            }
+            node = node.children[index];
+        }
+        <span class="keyword">return</span> node;
+    }
+}
+</div>
+            </div>
+
+            <!-- Tab 7: Interview Problems -->
+            <div class="tab-content">
+                <h2>💼 Top Interview Problems</h2>
+
+                <h3>1. Longest Substring Without Repeating Characters</h3>
+                <div class="problem-card">
+                    <h4>LeetCode #3 - Medium</h4>
+                    <span class="difficulty medium">Medium</span>
+                    <p><strong>Input:</strong> "abcabcbb"</p>
+                    <p><strong>Output:</strong> 3 (substring "abc")</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static int</span> <span class="method">lengthOfLongestSubstring</span>(String s) {
+    Map<Character, Integer> map = <span class="keyword">new</span> HashMap<>();
+    <span class="keyword">int</span> maxLen = 0, left = 0;
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> right = 0; right < s.<span class="method">length</span>(); right++) {
+        <span class="keyword">char</span> c = s.<span class="method">charAt</span>(right);
+        
+        <span class="keyword">if</span>(map.<span class="method">containsKey</span>(c)) {
+            left = Math.<span class="method">max</span>(left, map.<span class="method">get</span>(c) + 1);
+        }
+        
+        map.<span class="method">put</span>(c, right);
+        maxLen = Math.<span class="method">max</span>(maxLen, right - left + 1);
+    }
+    
+    <span class="keyword">return</span> maxLen;
+}
+</div>
+                <span class="complexity time">Time: O(n)</span>
+                <span class="complexity space">Space: O(min(n,m))</span>
+
+                <h3>2. Group Anagrams</h3>
+                <div class="problem-card">
+                    <h4>LeetCode #49 - Medium</h4>
+                    <span class="difficulty medium">Medium</span>
+                    <p><strong>Input:</strong> ["eat","tea","tan","ate","nat","bat"]</p>
+                    <p><strong>Output:</strong> [["bat"],["nat","tan"],["ate","eat","tea"]]</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static</span> List<List<String>> <span class="method">groupAnagrams</span>(String[] strs) {
+    Map<String, List<String>> map = <span class="keyword">new</span> HashMap<>();
+    
+    <span class="keyword">for</span>(String str : strs) {
+        <span class="keyword">char</span>[] chars = str.<span class="method">toCharArray</span>();
+        Arrays.<span class="method">sort</span>(chars);
+        String key = <span class="keyword">new</span> String(chars);
+        
+        map.<span class="method">putIfAbsent</span>(key, <span class="keyword">new</span> ArrayList<>());
+        map.<span class="method">get</span>(key).<span class="method">add</span>(str);
+    }
+    
+    <span class="keyword">return new</span> ArrayList<>(map.<span class="method">values</span>());
+}
+</div>
+
+                <h3>3. Valid Parentheses</h3>
+                <div class="problem-card">
+                    <h4>LeetCode #20 - Easy</h4>
+                    <span class="difficulty easy">Easy</span>
+                    <p><strong>Input:</strong> "({[]})"</p>
+                    <p><strong>Output:</strong> true</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static boolean</span> <span class="method">isValid</span>(String s) {
+    Stack<Character> stack = <span class="keyword">new</span> Stack<>();
+    
+    <span class="keyword">for</span>(<span class="keyword">char</span> c : s.<span class="method">toCharArray</span>()) {
+        <span class="keyword">if</span>(c == <span class="string">'('</span> || c == <span class="string">'{'</span> || c == <span class="string">'['</span>) {
+            stack.<span class="method">push</span>(c);
+        } <span class="keyword">else</span> {
+            <span class="keyword">if</span>(stack.<span class="method">isEmpty</span>()) <span class="keyword">return false</span>;
+            
+            <span class="keyword">char</span> top = stack.<span class="method">pop</span>();
+            <span class="keyword">if</span>((c == <span class="string">')'</span> && top != <span class="string">'('</span>) ||
+               (c == <span class="string">'}'</span> && top != <span class="string">'{'</span>) ||
+               (c == <span class="string">']'</span> && top != <span class="string">'['</span>)) {
+                <span class="keyword">return false</span>;
+            }
+        }
+    }
+    
+    <span class="keyword">return</span> stack.<span class="method">isEmpty</span>();
+}
+</div>
+
+                <h3>4. Minimum Window Substring</h3>
+                <div class="problem-card">
+                    <h4>LeetCode #76 - Hard</h4>
+                    <span class="difficulty hard">Hard</span>
+                    <p><strong>Input:</strong> s = "ADOBECODEBANC", t = "ABC"</p>
+                    <p><strong>Output:</strong> "BANC"</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static</span> String <span class="method">minWindow</span>(String s, String t) {
+    <span class="keyword">if</span>(s.length() == 0 || t.length() == 0) <span class="keyword">return</span> <span class="string">""</span>;
+    
+    Map<Character, Integer> need = <span class="keyword">new</span> HashMap<>();
+    Map<Character, Integer> window = <span class="keyword">new</span> HashMap<>();
+    
+    <span class="keyword">for</span>(<span class="keyword">char</span> c : t.<span class="method">toCharArray</span>()) {
+        need.<span class="method">put</span>(c, need.<span class="method">getOrDefault</span>(c, 0) + 1);
+    }
+    
+    <span class="keyword">int</span> left = 0, right = 0;
+    <span class="keyword">int</span> valid = 0;
+    <span class="keyword">int</span> start = 0, minLen = Integer.MAX_VALUE;
+    
+    <span class="keyword">while</span>(right < s.<span class="method">length</span>()) {
+        <span class="keyword">char</span> c = s.<span class="method">charAt</span>(right);
+        right++;
+        
+        <span class="keyword">if</span>(need.<span class="method">containsKey</span>(c)) {
+            window.<span class="method">put</span>(c, window.<span class="method">getOrDefault</span>(c, 0) + 1);
+            <span class="keyword">if</span>(window.<span class="method">get</span>(c).<span class="method">equals</span>(need.<span class="method">get</span>(c))) {
+                valid++;
+            }
+        }
+        
+        <span class="keyword">while</span>(valid == need.<span class="method">size</span>()) {
+            <span class="keyword">if</span>(right - left < minLen) {
+                start = left;
+                minLen = right - left;
+            }
+            
+            <span class="keyword">char</span> d = s.<span class="method">charAt</span>(left);
+            left++;
+            
+            <span class="keyword">if</span>(need.<span class="method">containsKey</span>(d)) {
+                <span class="keyword">if</span>(window.<span class="method">get</span>(d).<span class="method">equals</span>(need.<span class="method">get</span>(d))) {
+                    valid--;
+                }
+                window.<span class="method">put</span>(d, window.<span class="method">get</span>(d) - 1);
+            }
+        }
+    }
+    
+    <span class="keyword">return</span> minLen == Integer.MAX_VALUE ? <span class="string">""</span> : s.<span class="method">substring</span>(start, start + minLen);
+}
+</div>
+
+                <h3>5. Longest Repeating Character Replacement</h3>
+                <div class="problem-card">
+                    <h4>LeetCode #424 - Medium</h4>
+                    <span class="difficulty medium">Medium</span>
+                    <p>Replace at most k characters to get longest substring with same character</p>
+                </div>
+
+                <div class="code-block">
+<span class="keyword">public static int</span> <span class="method">characterReplacement</span>(String s, <span class="keyword">int</span> k) {
+    <span class="keyword">int</span>[] count = <span class="keyword">new int</span>[26];
+    <span class="keyword">int</span> maxCount = 0, maxLen = 0;
+    <span class="keyword">int</span> left = 0;
+    
+    <span class="keyword">for</span>(<span class="keyword">int</span> right = 0; right < s.<span class="method">length</span>(); right++) {
+        maxCount = Math.<span class="method">max</span>(maxCount, ++count[s.<span class="method">charAt</span>(right) - <span class="string">'A'</span>]);
+        
+        <span class="keyword">while</span>(right - left + 1 - maxCount > k) {
+            count[s.<span class="method">charAt</span>(left) - <span class="string">'A'</span>]--;
+            left++;
+        }
+        
+        maxLen = Math.<span class="method">max</span>(maxLen, right - left + 1);
+    }
+    
+    <span class="keyword">return</span> maxLen;
+}
+</div>
+
+                <div class="success-box">
+                    <h4>🎯 Practice Resources</h4>
+                    <ul>
+                        <li><strong>LeetCode:</strong> String tag problems (200+ questions)</li>
+                        <li><strong>HackerRank:</strong> String manipulation challenges</li>
+                        <li><strong>GeeksforGeeks:</strong> Complete string DSA tutorials</li>
+                        <li><strong>Codewars:</strong> String kata problems</li>
+                    </ul>
+                </div>
+
+                <h3>Key Interview Tips</h3>
+                <div class="info-box">
+                    <h4>💡 Common String Patterns</h4>
+                    <ol>
+                        <li><strong>Two Pointers:</strong> Palindrome, reverse, remove duplicates</li>
+                        <li><strong>Sliding Window:</strong> Substrings with conditions</li>
+                        <li><strong>HashMap:</strong> Anagrams, character frequency</li>
+                        <li><strong>Stack:</strong> Valid parentheses, next greater</li>
+                        <li><strong>DP:</strong> LCS, edit distance, palindrome</li>
+                        <li><strong>Trie:</strong> Prefix matching, autocomplete</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(index) {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>

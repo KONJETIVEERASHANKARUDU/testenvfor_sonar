@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding VIPER - Complete Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 32px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section h3 {
+            color: #764ba2;
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .section p {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .highlight-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .highlight-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .comparison-card.before {
+            background: #fff3f3;
+            border-color: #ff6b6b;
+        }
+
+        .comparison-card.after {
+            background: #f0fff4;
+            border-color: #51cf66;
+        }
+
+        .comparison-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comparison-card.before h4 {
+            color: #c92a2a;
+        }
+
+        .comparison-card.after h4 {
+            color: #2b8a3e;
+        }
+
+        .comparison-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .comparison-card ul li {
+            padding: 8px 0 8px 30px;
+            position: relative;
+            font-size: 16px;
+        }
+
+        .comparison-card.before ul li:before {
+            content: "❌";
+            position: absolute;
+            left: 0;
+        }
+
+        .comparison-card.after ul li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .who-uses {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .user-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .user-card h4 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-card p {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .user-card ul {
+            list-style: none;
+            padding-left: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .user-card ul li {
+            padding: 5px 0 5px 20px;
+            position: relative;
+        }
+
+        .user-card ul li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin: 30px 0;
+        }
+
+        .timeline:before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            width: 50%;
+            padding: 0 40px;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            text-align: left;
+        }
+
+        .timeline-item .dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border: 4px solid white;
+            border-radius: 50%;
+            top: 0;
+        }
+
+        .timeline-item:nth-child(odd) .dot {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .dot {
+            left: -10px;
+        }
+
+        .timeline-item .content {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .timeline-item h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .timeline-item p {
+            font-size: 15px;
+            color: #666;
+            margin: 0;
+        }
+
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 80px 1fr;
+            gap: 20px;
+            align-items: center;
+            margin: 30px 0;
+        }
+
+        .problem-box, .solution-box {
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .problem-box {
+            background: #fff3f3;
+            border: 2px solid #ff6b6b;
+        }
+
+        .problem-box h4 {
+            color: #c92a2a;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .solution-box {
+            background: #f0fff4;
+            border: 2px solid #51cf66;
+        }
+
+        .solution-box h4 {
+            color: #2b8a3e;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .arrow {
+            font-size: 48px;
+            text-align: center;
+            color: #667eea;
+        }
+
+        .key-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: #666;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .problem-solution {
+                grid-template-columns: 1fr;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+
+            .timeline:before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding: 0 0 0 60px !important;
+                text-align: left !important;
+                left: 0 !important;
+            }
+
+            .timeline-item .dot {
+                left: 10px !important;
+                right: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐍 Understanding VIPER</h1>
+            <div class="subtitle">Vertex Intelligent Pipeline for Enterprise Releases</div>
+        </div>
+
+        <div class="content">
+            <!-- What is VIPER -->
+            <div class="section">
+                <h2>❓ What is VIPER?</h2>
+                <p><strong>VIPER</strong> stands for <strong>Vertex Intelligent Pipeline for Enterprise Releases</strong>. It's an automated CI/CD (Continuous Integration/Continuous Deployment) platform built specifically for Vertex Inc.</p>
+                
+                <div class="highlight-box">
+                    <h4>In Simple Terms:</h4>
+                    <p>VIPER is like an <strong>assembly line for software</strong>. When developers write code, VIPER automatically:</p>
+                    <ul style="margin-top: 15px; padding-left: 25px;">
+                        <li>✅ Checks the code for bugs and security issues</li>
+                        <li>✅ Runs tests to make sure nothing breaks</li>
+                        <li>✅ Packages the application into containers</li>
+                        <li>✅ Deploys it to servers (Dev → QA → Stage → Production)</li>
+                        <li>✅ Monitors the application in production</li>
+                    </ul>
+                    <p style="margin-top: 15px;">All of this happens <strong>automatically</strong>, with minimal manual effort.</p>
+                </div>
+
+                <p>VIPER uses <strong>GitHub Actions</strong> (workflow automation) combined with tools like <strong>Snyk</strong> (security scanning), <strong>SonarQube</strong> (code quality), <strong>Kubernetes</strong> (container orchestration), and <strong>ArgoCD</strong> (deployment automation).</p>
+            </div>
+
+            <!-- Current Stats -->
+            <div class="section">
+                <h2>📊 VIPER Today</h2>
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="number">127+</div>
+                        <div class="label">Active Repositories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">7</div>
+                        <div class="label">Languages Supported</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">94%</div>
+                        <div class="label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="number">43</div>
+                        <div class="label">Deployments Daily</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why Was VIPER Introduced -->
+            <div class="section">
+                <h2>🎯 Why Was VIPER Introduced?</h2>
+                
+                <h3>The Problems Before VIPER:</h3>
+                <div class="comparison-grid">
+                    <div class="comparison-card before">
+                        <h4>❌ Before VIPER (The Old Way)</h4>
+                        <ul>
+                            <li>Each team built their own CI/CD pipelines</li>
+                            <li>Inconsistent security scanning across projects</li>
+                            <li>Manual deployment processes</li>
+                            <li>No standardized code quality checks</li>
+                            <li>Duplicate effort - every team solving same problems</li>
+                            <li>Hard to track what's deployed where</li>
+                            <li>Security vulnerabilities slipped through</li>
+                            <li>Slow deployment cycles (hours/days)</li>
+                            <li>Different tools for different languages</li>
+                            <li>No centralized monitoring</li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-card after">
+                        <h4>✅ With VIPER (The New Way)</h4>
+                        <ul>
+                            <li>Single standardized pipeline for all teams</li>
+                            <li>Automated security scanning on every PR</li>
+                            <li>One-click deployments across all environments</li>
+                            <li>Consistent quality gates enforced</li>
+                            <li>Reusable workflows - write once, use everywhere</li>
+                            <li>Full visibility via dashboard and ArgoCD</li>
+                            <li>Critical vulnerabilities caught before production</li>
+                            <li>Fast deployments (minutes, not hours)</li>
+                            <li>Unified platform supporting 7+ languages</li>
+                            <li>Centralized monitoring via Datadog</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>Major Reasons for Introducing VIPER:</h3>
+                <div class="key-features">
+                    <div class="feature-card">
+                        <div class="icon">🔒</div>
+                        <h4>Security First</h4>
+                        <p>Automatically scan every code change for vulnerabilities before it reaches production. Snyk SAST, SCA, and container scanning catch issues early.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">⚡</div>
+                        <h4>Speed & Efficiency</h4>
+                        <p>Reduce deployment time from hours to minutes. Automated testing and deployment means faster delivery of features to customers.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">📏</div>
+                        <h4>Standardization</h4>
+                        <p>One way to build, test, and deploy across all teams. New developers can onboard faster when everything works the same way.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">✅</div>
+                        <h4>Quality Assurance</h4>
+                        <p>Automated code quality checks with SonarQube and Super-linter. Enforce company-wide quality standards automatically.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">👀</div>
+                        <h4>Visibility</h4>
+                        <p>See the status of all deployments in real-time. Know exactly what version is running in each environment.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🤝</div>
+                        <h4>Compliance</h4>
+                        <p>Meet security and regulatory requirements automatically. Audit trails for all deployments and security scans.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- What Were They Using Before -->
+            <div class="section">
+                <h2>🕰️ What Were Teams Using Before VIPER?</h2>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>Jenkins Pipelines</h4>
+                            <p>Some teams used Jenkins for CI/CD, but it required significant maintenance and custom configuration per project. Each team had their own Jenkins instance and scripts.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>Manual Scripts</h4>
+                            <p>Teams wrote custom bash/PowerShell scripts to build and deploy. These scripts were error-prone, hard to maintain, and not reusable across teams.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>GitHub Actions (Ad-hoc)</h4>
+                            <p>Some teams had started using GitHub Actions but each repository had its own custom workflows. No standardization or reusability.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>Manual Deployments</h4>
+                            <p>Many teams still deployed manually using kubectl commands or clicking through AWS/Azure consoles. High risk of human error.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>Scattered Security Tools</h4>
+                            <p>Security scanning was optional and inconsistent. Some teams used different tools (or none at all), making it hard to enforce security standards.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>No Central Visibility</h4>
+                            <p>No single place to see what was deployed where. Teams had to check multiple systems to understand deployment status.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="problem-solution">
+                    <div class="problem-box">
+                        <h4>❌ The Old Way</h4>
+                        <p><strong>Fragmented Tools:</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 20px; font-size: 15px;">
+                            <li>Team A: Jenkins + custom scripts</li>
+                            <li>Team B: GitHub Actions + manual kubectl</li>
+                            <li>Team C: Bash scripts + AWS CLI</li>
+                            <li>Team D: Manual deployments</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Result:</strong> Duplication, inconsistency, security gaps, slow deployments</p>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div class="solution-box">
+                        <h4>✅ VIPER (The New Way)</h4>
+                        <p><strong>Unified Platform:</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 20px; font-size: 15px;">
+                            <li>All Teams: VIPER reusable workflows</li>
+                            <li>Standardized security scanning</li>
+                            <li>Automated Kubernetes deployments</li>
+                            <li>Centralized monitoring & visibility</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Result:</strong> Consistency, speed, security, visibility, efficiency</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Who Uses VIPER -->
+            <div class="section">
+                <h2>👥 Who Uses VIPER?</h2>
+                <p>VIPER is used by development teams across Vertex Inc. Here are the main user groups:</p>
+
+                <div class="who-uses">
+                    <div class="user-card">
+                        <h4>👨‍💻 Software Developers</h4>
+                        <p><strong>What they do:</strong></p>
+                        <ul>
+                            <li>Push code to GitHub</li>
+                            <li>Create pull requests</li>
+                            <li>Review automated scan results</li>
+                            <li>Fix security/quality issues</li>
+                            <li>Merge code to trigger deployments</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Teams using VIPER:</strong></p>
+                        <ul>
+                            <li>IPS (Invoice Processing Service)</li>
+                            <li>VCP (Vertex Cloud Platform)</li>
+                            <li>OSC (Order & Sign Capture)</li>
+                            <li>E-Invoicing Team</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-card">
+                        <h4>🔧 DevOps Engineers</h4>
+                        <p><strong>What they do:</strong></p>
+                        <ul>
+                            <li>Monitor pipeline performance</li>
+                            <li>Configure deployment targets</li>
+                            <li>Troubleshoot failed deployments</li>
+                            <li>Manage Kubernetes clusters</li>
+                            <li>Set up new repositories in VIPER</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Key people:</strong></p>
+                        <ul>
+                            <li>Productivity Engineering Team</li>
+                            <li>Platform Operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-card">
+                        <h4>🔐 Security Teams</h4>
+                        <p><strong>What they do:</strong></p>
+                        <ul>
+                            <li>Review security scan results</li>
+                            <li>Track critical vulnerabilities</li>
+                            <li>Set security policies</li>
+                            <li>Audit compliance</li>
+                            <li>Approve production deployments</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Tools they monitor:</strong></p>
+                        <ul>
+                            <li>Snyk SAST & SCA reports</li>
+                            <li>Container scan results</li>
+                            <li>SonarQube security hotspots</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-card">
+                        <h4>📊 Product Managers</h4>
+                        <p><strong>What they do:</strong></p>
+                        <ul>
+                            <li>Track feature delivery</li>
+                            <li>Monitor deployment status</li>
+                            <li>Plan release schedules</li>
+                            <li>Coordinate with engineering teams</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>What they care about:</strong></p>
+                        <ul>
+                            <li>When features go live</li>
+                            <li>Deployment success rates</li>
+                            <li>Pipeline performance metrics</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-card">
+                        <h4>👔 Engineering Leadership</h4>
+                        <p><strong>What they do:</strong></p>
+                        <ul>
+                            <li>Track platform adoption (127 repos)</li>
+                            <li>Monitor success rates (94%)</li>
+                            <li>Review onboarding progress</li>
+                            <li>Allocate resources for rollouts</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Key stakeholders:</strong></p>
+                        <ul>
+                            <li>VP Engineering</li>
+                            <li>Director of DevOps</li>
+                            <li>Team Leads</li>
+                        </ul>
+                    </div>
+
+                    <div class="user-card">
+                        <h4>🆕 New Teams Onboarding</h4>
+                        <p><strong>Current onboarding teams:</strong></p>
+                        <ul>
+                            <li>IPS Team (75% complete)</li>
+                            <li>VCP Team (90% complete)</li>
+                            <li>OSC Team (40% complete)</li>
+                            <li>E-Invoicing Team (25% complete)</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>What they need:</strong></p>
+                        <ul>
+                            <li>Onboarding documentation</li>
+                            <li>Support from DevOps team</li>
+                            <li>Config file templates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Purpose -->
+            <div class="section">
+                <h2>🎯 Main Purpose of VIPER</h2>
+                
+                <div class="highlight-box">
+                    <h4>Core Mission:</h4>
+                    <p style="font-size: 20px; font-weight: 500; color: #333;">
+                        <strong>"Provide a standardized, automated, and secure way to build, test, and deploy containerized applications at Vertex Inc."</strong>
+                    </p>
+                </div>
+
+                <h3>What VIPER Does for You:</h3>
+                
+                <div class="problem-solution" style="grid-template-columns: 1fr;">
+                    <div class="solution-box">
+                        <h4>🔄 Continuous Integration (CI)</h4>
+                        <p><strong>Automated PR Scanning:</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>✅ <strong>Snyk SAST:</strong> Find security vulnerabilities in your code</li>
+                            <li>✅ <strong>SonarQube:</strong> Check code quality and technical debt</li>
+                            <li>✅ <strong>Super-linter:</strong> Enforce coding standards</li>
+                            <li>✅ <strong>Snyk SCA:</strong> Scan dependencies for known vulnerabilities</li>
+                            <li>✅ <strong>Unit Tests:</strong> Run automated tests</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Result:</strong> Catch bugs and security issues BEFORE they reach production</p>
+                    </div>
+                </div>
+
+                <div class="problem-solution" style="grid-template-columns: 1fr; margin-top: 20px;">
+                    <div class="solution-box">
+                        <h4>🚀 Continuous Deployment (CD)</h4>
+                        <p><strong>Automated Kubernetes Deployments:</strong></p>
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>✅ <strong>Build Container:</strong> Create Docker images automatically</li>
+                            <li>✅ <strong>Container Scanning:</strong> Scan images for vulnerabilities</li>
+                            <li>✅ <strong>Helm Chart Generation:</strong> Package for Kubernetes</li>
+                            <li>✅ <strong>ArgoCD Deployment:</strong> Deploy to Dev → QA → Stage → Production</li>
+                            <li>✅ <strong>Migration Jobs:</strong> Run database migrations automatically</li>
+                            <li>✅ <strong>Datadog Integration:</strong> Set up monitoring dashboards</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Result:</strong> One-click deployments with full automation and visibility</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 40px;">The VIPER Workflow:</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>1️⃣ Developer Creates Pull Request</h4>
+                            <p>Developer writes code and creates a PR in GitHub. VIPER automatically kicks in.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>2️⃣ Automated PR Scanning</h4>
+                            <p>VIPER runs security scans, quality checks, linting, and tests. Results show up directly in the PR.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>3️⃣ Developer Fixes Issues</h4>
+                            <p>If scans find problems, developer fixes them. VIPER re-scans automatically on each commit.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>4️⃣ PR Gets Approved & Merged</h4>
+                            <p>Once all checks pass, team approves the PR. Code gets merged to main branch.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>5️⃣ Automated Build & Scan</h4>
+                            <p>VIPER builds a Docker container, scans it for vulnerabilities, and pushes to Artifactory.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>6️⃣ Deploy to Dev Environment</h4>
+                            <p>ArgoCD automatically deploys the new version to Dev environment for testing.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>7️⃣ Promote Through Environments</h4>
+                            <p>After validation, promote to QA → Stage → Production. Each environment gets the same tested container.</p>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="dot"></div>
+                        <div class="content">
+                            <h4>8️⃣ Production Deployment</h4>
+                            <p>Multi-region rollout to production (us-east-2, us-west-2). Datadog monitors health automatically.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Summary -->
+            <div class="section">
+                <h2>✨ Key Benefits of VIPER</h2>
+                
+                <div class="key-features">
+                    <div class="feature-card">
+                        <div class="icon">⏱️</div>
+                        <h4>Time Savings</h4>
+                        <p>What took hours now takes minutes. Automated workflows eliminate manual steps and waiting.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🎯</div>
+                        <h4>Consistency</h4>
+                        <p>Same process for all teams. No more "it works on my machine" problems.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🔒</div>
+                        <h4>Security by Default</h4>
+                        <p>Every code change is scanned. Critical vulnerabilities caught before production.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">📈</div>
+                        <h4>Faster Innovation</h4>
+                        <p>Teams can focus on features, not infrastructure. Deploy multiple times per day.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">👀</div>
+                        <h4>Full Visibility</h4>
+                        <p>See what's deployed where in real-time. Track metrics and deployment history.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="icon">🤖</div>
+                        <h4>Self-Service</h4>
+                        <p>Developers can deploy without waiting for DevOps. Project Venom makes onboarding easy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="section" style="margin-bottom: 0;">
+                <h2>📝 Summary</h2>
+                
+                <div class="highlight-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+                    <h4 style="color: white; font-size: 24px;">VIPER in One Sentence:</h4>
+                    <p style="font-size: 20px; margin: 15px 0 0 0; line-height: 1.8; color: white;">
+                        <strong>VIPER is Vertex's automated CI/CD platform that standardizes how all teams build, test, secure, and deploy applications - replacing fragmented manual processes with a fast, secure, and consistent pipeline serving 127+ repositories.</strong>
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px; padding: 25px; background: #f8f9ff; border-radius: 8px;">
+                    <h4 style="color: #667eea; margin-bottom: 15px; font-size: 22px;">Quick Facts:</h4>
+                    <ul style="padding-left: 25px; font-size: 16px; line-height: 2;">
+                        <li>✅ <strong>What:</strong> Automated CI/CD platform for Vertex</li>
+                        <li>✅ <strong>Why:</strong> Replace fragmented tools with standardized, secure pipelines</li>
+                        <li>✅ <strong>Who:</strong> Developers, DevOps, Security teams, PMs, Leadership</li>
+                        <li>✅ <strong>Before:</strong> Jenkins, manual scripts, ad-hoc GitHub Actions, manual deployments</li>
+                        <li>✅ <strong>Purpose:</strong> Fast, secure, automated software delivery</li>
+                        <li>✅ <strong>Impact:</strong> 127 repos, 94% success rate, 43 daily deployments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
