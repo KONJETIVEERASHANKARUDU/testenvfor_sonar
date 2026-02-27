@@ -197,10 +197,12 @@ jobs:
             if [ -d "target/surefire-reports" ]; then
               for xml_report in target/surefire-reports/TEST-*.xml; do
                 if [ -f "$xml_report" ]; then
-                  # Extract failure messages from XML
-                  grep -oP '(?<=message=")[^"]*' "$xml_report" 2>/dev/null | head -20 >> /tmp/analysis-report.md
-                  # Extract error type and message
-                  grep -oP '<failure[^>]*>.*?</failure>' "$xml_report" 2>/dev/null | sed 's/<[^>]*>//g' | head -30 >> /tmp/analysis-report.md
+                  # Extract failure messages using xmllint
+                  xmllint --xpath '//failure/@message' "$xml_report" 2>/dev/null | sed 's/ message="/\n/g' | sed 's/"//g' | head -20 >> /tmp/analysis-report.md || true
+                  # Extract failure text content
+                  xmllint --xpath '//failure/text()' "$xml_report" 2>/dev/null | head -30 >> /tmp/analysis-report.md || true
+                  # Extract error messages
+                  xmllint --xpath '//error/@message' "$xml_report" 2>/dev/null | sed 's/ message="/\n/g' | sed 's/"//g' | head -20 >> /tmp/analysis-report.md || true
                 fi
               done
             fi
