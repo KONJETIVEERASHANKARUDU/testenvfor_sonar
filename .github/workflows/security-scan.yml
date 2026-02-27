@@ -1,0 +1,126 @@
+name: 🔒 Security Scan (Scheduled)
+
+on:
+  schedule:
+    # Run every day at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  comprehensive-security-scan:
+    name: 🛡️ Comprehensive Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # ===== Dependency Scanning =====
+      - name: 📦 Snyk Dependency Scan
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium --all-projects
+          command: test
+      
+      - name: Snyk Monitor (Track dependencies)
+        uses: snyk/actions/maven@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+      
+      # ===== SAST Scanning =====
+      - name: 🔍 CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java, javascript, python
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+      
+      # ===== Container Scanning =====
+      - name: 🐳 Trivy Filesystem Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-fs-results.sarif'
+      
+      # ===== Secret Scanning =====
+      - name: 🔐 Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      # ===== License Compliance =====
+      - name: 📜 FOSSA License Scan
+        uses: fossas/fossa-action@main
+        continue-on-error: true
+        with:
+          api-key: ${{ secrets.FOSSA_API_KEY }}
+      
+      # ===== Generate Security Report =====
+      - name: 📊 Generate Security Report
+        run: |
+          cat > security-report.md << 'EOF'
+          # Security Scan Report
+          
+          **Scan Date:** $(date)
+          **Branch:** ${{ github.ref }}
+          **Commit:** ${{ github.sha }}
+          
+          ## Scans Performed
+          
+          - ✅ Dependency Vulnerabilities (Snyk)
+          - ✅ SAST Analysis (CodeQL)
+          - ✅ Container Scanning (Trivy)
+          - ✅ Secret Detection (Gitleaks)
+          - ✅ License Compliance (FOSSA)
+          
+          ## Results
+          
+          See detailed results in GitHub Security tab.
+          
+          EOF
+      
+      - name: Upload Security Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.md
+      
+      # ===== Notification =====
+      - name: 📧 Notify Security Team
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "🚨 Security scan found issues!",
+              attachments: [{
+                color: 'danger',
+                text: `Repository: ${{ github.repository }}\nBranch: ${{ github.ref }}\nView: ${{ github.server_url }}/${{ github.repository }}/security`
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_SECURITY_WEBHOOK }}
